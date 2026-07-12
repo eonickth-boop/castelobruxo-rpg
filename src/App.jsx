@@ -23,6 +23,9 @@ function App() {
   const [destinatario, setDestinatario] = useState('')
   const [valorTransferencia, setValorTransferencia] = useState('')
   const [itemComprando, setItemComprando] = useState(null)
+  const [mostrarAlterarSenha, setMostrarAlterarSenha] = useState(false)
+  const [novaSenha, setNovaSenha] = useState('')
+  const [confirmacaoSenha, setConfirmacaoSenha] = useState('')
 
   useEffect(() => {
     async function verificarSessao() {
@@ -339,6 +342,40 @@ function App() {
     setCarregando(false)
   }
 
+  async function alterarSenha(evento) {
+    evento.preventDefault()
+    setMensagem('')
+
+    if (novaSenha.length < 8) {
+      setMensagem('A nova senha precisa ter pelo menos 8 caracteres.')
+      return
+    }
+
+    if (novaSenha !== confirmacaoSenha) {
+      setMensagem('As senhas não coincidem.')
+      return
+    }
+
+    setCarregando(true)
+
+    const { error } = await supabase.auth.updateUser({
+      password: novaSenha,
+    })
+
+    if (error) {
+      console.error(error)
+      setMensagem(error.message || 'Não foi possível alterar a senha.')
+      setCarregando(false)
+      return
+    }
+
+    setNovaSenha('')
+    setConfirmacaoSenha('')
+    setMostrarAlterarSenha(false)
+    setMensagem('Senha alterada com sucesso.')
+    setCarregando(false)
+  }
+
   async function sair() {
     await supabase.auth.signOut()
 
@@ -353,6 +390,9 @@ function App() {
     setDestinatario('')
     setValorTransferencia('')
     setItemComprando(null)
+    setMostrarAlterarSenha(false)
+    setNovaSenha('')
+    setConfirmacaoSenha('')
     setPagina('inicio')
   }
 
@@ -500,6 +540,145 @@ function App() {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div
+            style={{
+              borderTop: '1px solid rgba(255,255,255,.08)',
+              marginTop: '26px',
+              paddingTop: '22px',
+              textAlign: 'center',
+            }}
+          >
+            {!mostrarAlterarSenha ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setMostrarAlterarSenha(true)
+                  setMensagem('')
+                }}
+                style={{
+                  minWidth: '220px',
+                  padding: '13px 18px',
+                  fontWeight: '700',
+                }}
+              >
+                🔒 Alterar senha
+              </button>
+            ) : (
+              <form
+                onSubmit={alterarSenha}
+                style={{
+                  maxWidth: '420px',
+                  margin: '0 auto',
+                  textAlign: 'left',
+                }}
+              >
+                <h3
+                  style={{
+                    color: '#e5c16b',
+                    textAlign: 'center',
+                    marginTop: 0,
+                    marginBottom: '20px',
+                  }}
+                >
+                  Alterar senha
+                </h3>
+
+                <label
+                  htmlFor="nova-senha"
+                  style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    color: '#d8ddda',
+                    fontWeight: '600',
+                  }}
+                >
+                  Nova senha
+                </label>
+
+                <input
+                  id="nova-senha"
+                  type="password"
+                  value={novaSenha}
+                  onChange={(evento) => setNovaSenha(evento.target.value)}
+                  autoComplete="new-password"
+                  placeholder="Mínimo de 8 caracteres"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '13px',
+                    marginBottom: '16px',
+                  }}
+                />
+
+                <label
+                  htmlFor="confirmacao-senha"
+                  style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    color: '#d8ddda',
+                    fontWeight: '600',
+                  }}
+                >
+                  Confirme a nova senha
+                </label>
+
+                <input
+                  id="confirmacao-senha"
+                  type="password"
+                  value={confirmacaoSenha}
+                  onChange={(evento) =>
+                    setConfirmacaoSenha(evento.target.value)
+                  }
+                  autoComplete="new-password"
+                  placeholder="Digite novamente"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '13px',
+                    marginBottom: '18px',
+                  }}
+                />
+
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '10px',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <button
+                    type="submit"
+                    disabled={carregando}
+                    style={{
+                      flex: '1 1 180px',
+                      padding: '13px 18px',
+                      fontWeight: '700',
+                    }}
+                  >
+                    {carregando ? 'Alterando...' : 'Salvar nova senha'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMostrarAlterarSenha(false)
+                      setNovaSenha('')
+                      setConfirmacaoSenha('')
+                      setMensagem('')
+                    }}
+                    disabled={carregando}
+                    style={{
+                      flex: '1 1 140px',
+                      padding: '13px 18px',
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </section>
 
