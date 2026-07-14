@@ -1,3 +1,4 @@
+import StudentDesk from "../components/studentDesk/StudentDesk";
 export default function Home({
   perfil,
   carregarCarteira,

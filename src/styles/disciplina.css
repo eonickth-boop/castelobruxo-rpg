@@ -1,0 +1,209 @@
+.disciplina-pagina {
+  width: min(1040px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 60px;
+  color: #eee7d7;
+}
+
+.disciplina-voltar { margin-bottom: 22px; }
+
+.disciplina-header {
+  position: relative;
+  margin-bottom: 24px;
+  padding: clamp(32px, 6vw, 54px);
+  text-align: center;
+  background:
+    radial-gradient(circle at top, rgba(229,193,107,.13), transparent 42%),
+    linear-gradient(180deg, rgba(28,40,32,.98), rgba(12,18,14,.99));
+  border: 1px solid rgba(201,164,92,.38);
+  border-radius: 24px;
+  box-shadow: 0 22px 48px rgba(0,0,0,.34);
+}
+
+.disciplina-header-professor {
+  width: 82px;
+  height: 82px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  margin: 0 auto 14px;
+  background: rgba(201,164,92,.1);
+  border: 2px solid rgba(201,164,92,.35);
+  border-radius: 50%;
+  font-size: 2rem;
+}
+
+.disciplina-header-professor img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.disciplina-header > p {
+  margin: 0 0 8px;
+  color: #8fa091;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: .72rem;
+}
+
+.disciplina-header h1 {
+  margin: 0 0 10px;
+  color: #e5c16b;
+  font-family: Georgia, serif;
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+}
+
+.disciplina-header > strong {
+  display: block;
+  margin-bottom: 16px;
+  color: #ead39a;
+}
+
+.disciplina-header > span {
+  max-width: 720px;
+  display: block;
+  margin: auto;
+  color: #b8c2ba;
+  line-height: 1.7;
+}
+
+.disciplina-progresso {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: rgba(24,34,27,.94);
+  border: 1px solid rgba(201,164,92,.25);
+  border-radius: 16px;
+}
+
+.disciplina-progresso > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 9px;
+  color: #aeb9b0;
+}
+
+.disciplina-progresso strong { color: #f0d27a; }
+
+.disciplina-barra {
+  height: 12px;
+  overflow: hidden;
+  background: rgba(255,255,255,.07);
+  border-radius: 999px;
+}
+
+.disciplina-barra span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #6b8c68, #d4ad50);
+  border-radius: inherit;
+}
+
+.disciplina-progresso small {
+  display: block;
+  margin-top: 9px;
+  color: #8fa091;
+}
+
+.lista-aulas {
+  display: grid;
+  gap: 15px;
+}
+
+.aula-card {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(31,42,34,.98), rgba(17,23,19,.99));
+  border: 1px solid rgba(201,164,92,.25);
+  border-radius: 17px;
+  box-shadow: 0 13px 28px rgba(0,0,0,.26);
+}
+
+.aula-card-concluida {
+  border-color: rgba(111,170,113,.42);
+}
+
+.aula-card-numero {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  color: #e5c16b;
+  background: rgba(201,164,92,.08);
+  border: 1px solid rgba(201,164,92,.25);
+  border-radius: 14px;
+  font-weight: 800;
+}
+
+.aula-card-concluida .aula-card-numero {
+  color: #a7d8ac;
+  background: rgba(106,170,113,.1);
+  border-color: rgba(106,170,113,.3);
+}
+
+.aula-card-topo {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.aula-card-topo small {
+  color: #8fa091;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.aula-card-topo span {
+  color: #d8c489;
+  font-size: .78rem;
+}
+
+.aula-card h2 {
+  margin: 8px 0;
+  color: #f0e7d6;
+  font-family: Georgia, serif;
+  font-size: 1.35rem;
+}
+
+.aula-card p {
+  margin: 0 0 13px;
+  color: #aeb9b0;
+  line-height: 1.55;
+}
+
+.aula-card-dados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: #d6c392;
+  font-size: .82rem;
+}
+
+.disciplina-estado,
+.disciplina-mensagem {
+  padding: 22px;
+  text-align: center;
+  background: rgba(28,34,29,.92);
+  border: 1px solid rgba(201,164,92,.25);
+  border-radius: 14px;
+}
+
+@media (max-width: 720px) {
+  .disciplina-pagina {
+    width: min(100% - 20px, 1040px);
+    padding-top: 72px;
+  }
+
+  .aula-card {
+    grid-template-columns: 46px 1fr;
+  }
+
+  .aula-card > button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}

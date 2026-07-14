@@ -1,0 +1,271 @@
+.biblioteca{
+
+max-width:1200px;
+
+margin:auto;
+
+padding:40px;
+
+}
+
+.biblioteca-header{
+
+text-align:center;
+
+margin-bottom:40px;
+
+}
+
+.biblioteca-header h1{
+
+font-size:3rem;
+
+color:#e5c16b;
+
+}
+
+.biblioteca-header p{
+
+color:#cfcfcf;
+
+font-size:1.1rem;
+
+}
+
+.biblioteca-pesquisa{
+
+display:flex;
+
+justify-content:center;
+
+margin-bottom:25px;
+
+}
+
+.biblioteca-pesquisa input{
+
+width:420px;
+
+padding:14px;
+
+border-radius:10px;
+
+border:none;
+
+font-size:16px;
+
+}
+
+.categorias{
+
+display:flex;
+
+gap:15px;
+
+justify-content:center;
+
+flex-wrap:wrap;
+
+margin-bottom:40px;
+
+}
+
+.categorias button{
+
+padding:10px 18px;
+
+border-radius:20px;
+
+cursor:pointer;
+
+}
+
+.estante{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+
+gap:30px;
+
+}
+
+.livro-card{
+
+background:#243528;
+
+border-radius:15px;
+
+padding:20px;
+
+text-align:center;
+
+transition:.3s;
+
+}
+
+.livro-card:hover{
+
+transform:translateY(-6px);
+
+}
+
+.capa{
+
+height:220px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+font-size:90px;
+
+background:#c7ab71;
+
+border-radius:8px;
+
+margin-bottom:18px;
+
+}
+
+.livro-card h2{
+
+font-size:22px;
+
+color:#e5c16b;
+
+margin-bottom:10px;
+
+}
+
+.livro-card p{
+
+color:#ddd;
+
+margin-bottom:20px;
+
+.capa-livro{
+
+width:100%;
+
+height:280px;
+
+object-fit:cover;
+
+border-radius:8px;
+
+margin-bottom:15px;
+
+box-shadow:0 6px 16px rgba(0,0,0,.35);
+
+}
+
+.biblioteca-selo {
+  margin-bottom: 8px;
+  color: #9eaa9f;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.78rem;
+}
+
+.biblioteca-pesquisa input {
+  width: min(520px, 100%);
+  background: rgba(20, 27, 22, 0.94);
+  color: #eee7d7;
+  border: 1px solid rgba(201, 164, 92, 0.35);
+}
+
+.categorias .categoria-ativa {
+  background: linear-gradient(180deg, #d8b866, #a97d2e);
+  color: #1c1a14;
+  border-color: rgba(238, 207, 126, 0.85);
+  font-weight: 700;
+}
+
+.estante {
+  align-items: stretch;
+}
+
+.livro-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 530px;
+  border: 1px solid rgba(201, 164, 92, 0.38);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32);
+}
+
+.capa-container {
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.capa-sem-imagem {
+  width: 100%;
+  height: 280px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #c7ab71;
+  font-size: 5rem;
+}
+
+.livro-card-conteudo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.livro-categoria {
+  display: inline-block;
+  align-self: center;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  border: 1px solid rgba(201, 164, 92, 0.3);
+  border-radius: 999px;
+  color: #d7c187;
+  font-size: 0.82rem;
+}
+
+.livro-autor {
+  color: #bbb7aa;
+}
+
+.livro-descricao {
+  flex: 1;
+  color: #aeb9b0;
+  line-height: 1.55;
+  font-size: 0.93rem;
+}
+
+.livro-card > button {
+  width: 100%;
+  margin-top: 18px;
+}
+
+.biblioteca-estado,
+.biblioteca-mensagem {
+  padding: 22px;
+  text-align: center;
+  border: 1px solid rgba(201, 164, 92, 0.25);
+  border-radius: 14px;
+  background: rgba(28, 34, 29, 0.9);
+}
+
+@media (max-width: 600px) {
+  .biblioteca {
+    padding: 18px;
+  }
+
+  .biblioteca-header h1 {
+    font-size: 2.1rem;
+  }
+
+  .livro-card {
+    min-height: auto;
+  }
+}
+}

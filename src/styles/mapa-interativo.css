@@ -1,0 +1,325 @@
+.mapa-pagina {
+  width: min(1240px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 60px;
+}
+
+.mapa-voltar {
+  margin-bottom: 22px;
+}
+
+.mapa-hero {
+  margin-bottom: 20px;
+  padding: clamp(30px, 6vw, 54px);
+  text-align: center;
+  background:
+    radial-gradient(circle at top, rgba(229,193,107,.16), transparent 42%),
+    linear-gradient(180deg, rgba(30,42,34,.99), rgba(12,18,14,.99));
+  border: 1px solid rgba(201,164,92,.42);
+  border-radius: 24px;
+  box-shadow: 0 24px 54px rgba(0,0,0,.38);
+}
+
+.mapa-hero > p {
+  margin: 0 0 8px;
+  color: #8fa091;
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  font-size: .72rem;
+}
+
+.mapa-hero h1 {
+  margin: 0 0 10px;
+  color: #e5c16b;
+  font-family: Georgia, serif;
+  font-size: clamp(2.3rem, 6vw, 4rem);
+}
+
+.mapa-hero > span {
+  color: #c3ccc5;
+}
+
+.mapa-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  gap: 18px;
+  align-items: start;
+}
+
+.mapa-tabuleiro {
+  position: relative;
+  min-height: 720px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 25%, rgba(112,148,91,.25), transparent 17%),
+    radial-gradient(circle at 76% 28%, rgba(107,142,91,.23), transparent 19%),
+    radial-gradient(circle at 58% 72%, rgba(82,119,71,.26), transparent 21%),
+    linear-gradient(135deg, #7e8f68, #5d704f 44%, #42543d);
+  border: 12px solid #5a3f22;
+  outline: 3px solid #9b7441;
+  outline-offset: -9px;
+  border-radius: 24px;
+  box-shadow: 0 24px 54px rgba(0,0,0,.38);
+}
+
+.mapa-tabuleiro::before,
+.mapa-tabuleiro::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #2f4a31 0 30%, transparent 31%),
+    radial-gradient(circle at 70% 30%, #385b39 0 22%, transparent 23%),
+    radial-gradient(circle at 30% 70%, #28452d 0 22%, transparent 23%);
+  opacity: .72;
+}
+
+.mapa-tabuleiro::before {
+  width: 310px;
+  height: 250px;
+  left: -70px;
+  bottom: -30px;
+}
+
+.mapa-tabuleiro::after {
+  width: 340px;
+  height: 260px;
+  right: -80px;
+  top: -20px;
+}
+
+.mapa-rio {
+  position: absolute;
+  width: 160%;
+  height: 72px;
+  left: -30%;
+  top: 43%;
+  background: linear-gradient(180deg, #6f9e9b, #3f7778);
+  transform: rotate(-12deg);
+  box-shadow:
+    inset 0 8px 10px rgba(255,255,255,.1),
+    inset 0 -8px 10px rgba(0,0,0,.2);
+}
+
+.mapa-caminho {
+  position: absolute;
+  height: 16px;
+  background: #b89a6d;
+  border: 2px solid rgba(75,53,27,.5);
+  border-radius: 999px;
+  transform-origin: left center;
+}
+
+.mapa-caminho-um {
+  width: 56%;
+  left: 20%;
+  top: 34%;
+  transform: rotate(18deg);
+}
+
+.mapa-caminho-dois {
+  width: 47%;
+  left: 33%;
+  top: 63%;
+  transform: rotate(-28deg);
+}
+
+.mapa-marcador {
+  position: absolute;
+  z-index: 3;
+  width: 116px;
+  min-height: 92px;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  padding: 10px;
+  transform: translate(-50%, -50%);
+  color: #f3ead9;
+  background: rgba(25,34,27,.92);
+  border: 2px solid rgba(229,193,107,.58);
+  border-radius: 16px;
+  box-shadow: 0 10px 22px rgba(0,0,0,.35);
+}
+
+.mapa-marcador:hover,
+.mapa-marcador.selecionado {
+  transform: translate(-50%, -50%) scale(1.08);
+  border-color: #efd276;
+}
+
+.mapa-marcador > span {
+  font-size: 1.8rem;
+}
+
+.mapa-marcador strong {
+  font-size: .78rem;
+  line-height: 1.15;
+}
+
+.mapa-marcador.bloqueado {
+  opacity: .68;
+  filter: grayscale(.6);
+}
+
+.mapa-marcador small {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+}
+
+.mapa-painel {
+  position: sticky;
+  top: 20px;
+  padding: 22px;
+  background: linear-gradient(180deg, rgba(31,42,34,.99), rgba(16,22,18,.99));
+  border: 1px solid rgba(201,164,92,.27);
+  border-radius: 18px;
+  box-shadow: 0 16px 34px rgba(0,0,0,.3);
+}
+
+.mapa-painel-topo {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.mapa-painel-topo > span {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  background: rgba(201,164,92,.09);
+  border: 1px solid rgba(201,164,92,.27);
+  border-radius: 50%;
+  font-size: 1.8rem;
+}
+
+.mapa-painel-topo small {
+  color: #8fa091;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.mapa-painel h2 {
+  margin: 4px 0 0;
+  color: #e5c16b;
+  font-family: Georgia, serif;
+}
+
+.mapa-painel > p {
+  color: #aeb9b0;
+  line-height: 1.6;
+}
+
+.mapa-requisitos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.mapa-requisitos div {
+  padding: 10px;
+  text-align: center;
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 10px;
+}
+
+.mapa-requisitos small {
+  display: block;
+  margin-bottom: 4px;
+  color: #8fa091;
+}
+
+.mapa-requisitos strong {
+  color: #dfd1aa;
+  font-size: .85rem;
+}
+
+.mapa-status {
+  margin-bottom: 14px;
+  padding: 12px;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.mapa-status.desbloqueado {
+  color: #a9d0a5;
+  background: rgba(95,140,88,.1);
+  border: 1px solid rgba(95,140,88,.25);
+}
+
+.mapa-status.bloqueado {
+  color: #d4a293;
+  background: rgba(145,78,60,.1);
+  border: 1px solid rgba(145,78,60,.24);
+}
+
+.mapa-painel > button {
+  width: 100%;
+}
+
+.mapa-legenda {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.mapa-legenda h3 {
+  color: #e5c16b;
+}
+
+.mapa-legenda > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  color: #aeb9b0;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+
+.mapa-legenda span {
+  color: #8fa091;
+}
+
+.mapa-mensagem,
+.mapa-estado {
+  padding: 18px;
+  text-align: center;
+  background: rgba(24,34,27,.94);
+  border: 1px solid rgba(201,164,92,.25);
+  border-radius: 14px;
+}
+
+@media (max-width: 940px) {
+  .mapa-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .mapa-painel {
+    position: static;
+  }
+}
+
+@media (max-width: 720px) {
+  .mapa-pagina {
+    width: min(100% - 20px, 1240px);
+    padding-top: 72px;
+  }
+
+  .mapa-tabuleiro {
+    min-height: 600px;
+    overflow-x: auto;
+  }
+
+  .mapa-marcador {
+    width: 94px;
+    min-height: 78px;
+    font-size: .76rem;
+  }
+
+  .mapa-requisitos {
+    grid-template-columns: 1fr;
+  }
+}

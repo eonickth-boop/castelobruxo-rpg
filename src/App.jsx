@@ -3,6 +3,40 @@ import { supabase } from './services/supabase'
 import './App.css'
 import CardItem from './components/CardItem'
 import Notificacao from './components/Notificacao'
+import Cadastro from './pages/Cadastro'
+import Biblioteca from './pages/Biblioteca'
+import Aulas from './pages/Aulas'
+import Disciplina from './pages/Disciplina'
+import Aula from './pages/Aula'
+import PainelProfessor from './pages/PainelProfessor'
+import CriarAula from './pages/CriarAula'
+import QuadroAvisos from './pages/QuadroAvisos'
+import DiarioPersonagem from './pages/DiarioPersonagem'
+import PerfilPublico from './pages/PerfilPublico'
+import HomeCastelobruxo from './pages/HomeCastelobruxo'
+import StudentDesk from './components/studentDesk/StudentDesk'
+import Pets from './pages/Pets'
+import PerfilPersonagem from './pages/PerfilPersonagem'
+import CorreioMagico from './pages/CorreioMagico'
+import Conquistas from './pages/Conquistas'
+import Mercado from './pages/Mercado'
+import Inventario from './pages/Inventario'
+import Certificados from './pages/Certificados'
+import Missoes from './pages/Missoes'
+import Eventos from './pages/Eventos'
+import MapaInterativo from './pages/MapaInterativo'
+import LocalMapa from './pages/LocalMapa'
+import './styles/home-mapa-atalho.css'
+import PainelAdministrativo from './pages/PainelAdministrativo'
+import './styles/revisao-etapa-13.css'
+import './styles/home-etapa-13-2-1.css'
+import './styles/polimento-etapa-13-2-2.css'
+import CmsConteudo from './pages/CmsConteudo'
+import UploadsPerfil from './pages/UploadsPerfil'
+import PetPerfil from './pages/PetPerfil'
+import './styles/perfil-pets-etapa-14.css'
+import CriacaoPersonagem from './pages/CriacaoPersonagem'
+import CerimoniaTribos from './pages/CerimoniaTribos'
 
 function App() {
   const [usuario, setUsuario] = useState('')
@@ -26,6 +60,58 @@ function App() {
   const [mostrarAlterarSenha, setMostrarAlterarSenha] = useState(false)
   const [novaSenha, setNovaSenha] = useState('')
   const [confirmacaoSenha, setConfirmacaoSenha] = useState('')
+  const [modoCadastro, setModoCadastro] = useState(false)
+  const [disciplinaSelecionadaId, setDisciplinaSelecionadaId] = useState(null)
+  const [aulaSelecionada, setAulaSelecionada] = useState(null)
+  const [localMapaSelecionado, setLocalMapaSelecionado] = useState(null)
+  const [petSelecionado, setPetSelecionado] = useState(null)
+
+  useEffect(() => {
+    function navegarPelaSidebar(evento) {
+      const destino = evento.detail?.pagina
+
+      if (!destino) return
+
+      setMensagem('')
+
+      if (destino === 'banco') {
+        carregarCarteira()
+        return
+      }
+
+      if (destino === 'mercado') {
+        carregarMercado()
+        return
+      }
+
+      if (destino === 'inventario') {
+        carregarInventario()
+        return
+      }
+
+      if (destino === 'perfil') {
+        carregarPerfilJogador()
+        return
+      }
+
+      setPagina(destino)
+    }
+
+    window.addEventListener('castelobruxo:navegar', navegarPelaSidebar)
+
+    return () => {
+      window.removeEventListener('castelobruxo:navegar', navegarPelaSidebar)
+    }
+  }, [sessao])
+
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent('castelobruxo:pagina-alterada', {
+        detail: { pagina },
+      }),
+    )
+  }, [pagina])
+
 
   useEffect(() => {
     async function verificarSessao() {
@@ -45,6 +131,7 @@ function App() {
       data.subscription.unsubscribe()
     }
   }, [])
+
 
   useEffect(() => {
     async function carregarPerfil() {
@@ -393,6 +480,9 @@ function App() {
     setMostrarAlterarSenha(false)
     setNovaSenha('')
     setConfirmacaoSenha('')
+    setModoCadastro(false)
+    setDisciplinaSelecionadaId(null)
+    setAulaSelecionada(null)
     setPagina('inicio')
   }
 
@@ -400,432 +490,171 @@ function App() {
     return <p style={{ padding: '40px' }}>Carregando perfil...</p>
   }
 
-  if (sessao && perfil && pagina === 'perfil') {
-    const nomeExibido = perfil.nome_personagem || perfil.usuario
-
+  if (
+    sessao &&
+    perfil &&
+    perfil.personagem_criado !== true
+  ) {
     return (
-      <main
-        style={{
-          maxWidth: '760px',
-          margin: '40px auto',
-          padding: '24px',
+      <CriacaoPersonagem
+        perfil={perfil}
+        sair={sair}
+        onConcluido={async () => {
+          const { data, error } = await supabase
+            .from('perfis')
+            .select('*')
+            .eq('id', perfil.id)
+            .single()
+
+          if (error) {
+            console.error(
+              'Erro ao recarregar perfil após criação:',
+              error,
+            )
+            setMensagem(
+              'Personagem criado, mas o perfil não pôde ser recarregado.',
+            )
+            return
+          }
+
+          setPerfil(data)
+          setPagina('inicio')
+          setMensagem('')
         }}
-      >
-        <button
-          onClick={() => {
-            setPagina('inicio')
-            setMensagem('')
-          }}
-        >
-          Voltar
-        </button>
+      />
+    )
+  }
 
-        <div
-          style={{
-            textAlign: 'center',
-            marginBottom: '30px',
-          }}
-        >
-          <h1
-            style={{
-              fontSize: '2.7rem',
-              color: '#e5c16b',
-              marginBottom: '8px',
-            }}
-          >
-            Perfil do Jogador
-          </h1>
+  if (
+    sessao &&
+    perfil &&
+    perfil.personagem_criado === true &&
+    perfil.selecao_tribo_concluida !== true
+  ) {
+    return (
+      <CerimoniaTribos
+        perfil={perfil}
+        sair={sair}
+        onConcluido={async () => {
+          const { data, error } = await supabase
+            .from('perfis')
+            .select('*')
+            .eq('id', perfil.id)
+            .single()
 
-          <p style={{ color: '#cfd6cf' }}>
-            Registro estudantil de Castelobruxo
-          </p>
-        </div>
+          if (error) {
+            console.error(
+              'Erro ao recarregar perfil após cerimônia:',
+              error,
+            )
+            setMensagem(
+              'A cerimônia terminou, mas o perfil não pôde ser recarregado.',
+            )
+            return
+          }
 
-        <section
-          style={{
-            background:
-              'linear-gradient(180deg, rgba(28,34,29,.98), rgba(17,20,18,.98))',
-            border: '1px solid rgba(201,164,92,.45)',
-            borderRadius: '18px',
-            padding: '28px',
-            boxShadow: '0 12px 30px rgba(0,0,0,.35)',
-          }}
-        >
-          <div
-            style={{
-              width: '110px',
-              height: '110px',
-              margin: '0 auto 18px',
-              borderRadius: '50%',
-              display: 'grid',
-              placeItems: 'center',
-              overflow: 'hidden',
-              background: 'rgba(201,164,92,.12)',
-              border: '1px solid rgba(201,164,92,.45)',
-              fontSize: '2.5rem',
-            }}
-          >
-            {perfil.avatar_url ? (
-              <img
-                src={perfil.avatar_url}
-                alt={nomeExibido}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  display: 'block',
-                }}
-              />
-            ) : (
-              '👤'
-            )}
-          </div>
+          setPerfil(data)
+          setPagina('inicio')
+          setMensagem('')
+        }}
+      />
+    )
+  }
 
-          <h2
-            style={{
-              textAlign: 'center',
-              color: '#f3ead2',
-              marginBottom: '6px',
-            }}
-          >
-            {nomeExibido}
-          </h2>
-
-          <p
-            style={{
-              textAlign: 'center',
-              color: '#aab7aa',
-              marginTop: 0,
-              marginBottom: '28px',
-            }}
-          >
-            @{perfil.usuario}
-          </p>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-              gap: '14px',
-            }}
-          >
-            {[
-              ['Cargo', perfil.cargo || 'Aluno'],
-              ['Tribo', perfil.tribo || 'Não definida'],
-              ['Ano', perfil.ano],
-              ['Nível', perfil.nivel],
-              ['XP', perfil.xp],
-              ['Saldo', `${saldo ?? 0} Ipês`],
-            ].map(([titulo, valor]) => (
-              <div
-                key={titulo}
-                style={{
-                  background: 'rgba(35,45,37,.85)',
-                  border: '1px solid rgba(255,255,255,.07)',
-                  borderRadius: '12px',
-                  padding: '16px',
-                  textAlign: 'center',
-                }}
-              >
-                <small style={{ color: '#aab7aa' }}>{titulo}</small>
-                <div
-                  style={{
-                    color: '#e5c16b',
-                    fontWeight: '700',
-                    fontSize: '1.15rem',
-                    marginTop: '7px',
-                  }}
-                >
-                  {valor}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div
-            style={{
-              borderTop: '1px solid rgba(255,255,255,.08)',
-              marginTop: '26px',
-              paddingTop: '22px',
-              textAlign: 'center',
-            }}
-          >
-            {!mostrarAlterarSenha ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setMostrarAlterarSenha(true)
-                  setMensagem('')
-                }}
-                style={{
-                  minWidth: '220px',
-                  padding: '13px 18px',
-                  fontWeight: '700',
-                }}
-              >
-                🔒 Alterar senha
-              </button>
-            ) : (
-              <form
-                onSubmit={alterarSenha}
-                style={{
-                  maxWidth: '420px',
-                  margin: '0 auto',
-                  textAlign: 'left',
-                }}
-              >
-                <h3
-                  style={{
-                    color: '#e5c16b',
-                    textAlign: 'center',
-                    marginTop: 0,
-                    marginBottom: '20px',
-                  }}
-                >
-                  Alterar senha
-                </h3>
-
-                <label
-                  htmlFor="nova-senha"
-                  style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    color: '#d8ddda',
-                    fontWeight: '600',
-                  }}
-                >
-                  Nova senha
-                </label>
-
-                <input
-                  id="nova-senha"
-                  type="password"
-                  value={novaSenha}
-                  onChange={(evento) => setNovaSenha(evento.target.value)}
-                  autoComplete="new-password"
-                  placeholder="Mínimo de 8 caracteres"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '13px',
-                    marginBottom: '16px',
-                  }}
-                />
-
-                <label
-                  htmlFor="confirmacao-senha"
-                  style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    color: '#d8ddda',
-                    fontWeight: '600',
-                  }}
-                >
-                  Confirme a nova senha
-                </label>
-
-                <input
-                  id="confirmacao-senha"
-                  type="password"
-                  value={confirmacaoSenha}
-                  onChange={(evento) =>
-                    setConfirmacaoSenha(evento.target.value)
-                  }
-                  autoComplete="new-password"
-                  placeholder="Digite novamente"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '13px',
-                    marginBottom: '18px',
-                  }}
-                />
-
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: '10px',
-                    flexWrap: 'wrap',
-                  }}
-                >
-                  <button
-                    type="submit"
-                    disabled={carregando}
-                    style={{
-                      flex: '1 1 180px',
-                      padding: '13px 18px',
-                      fontWeight: '700',
-                    }}
-                  >
-                    {carregando ? 'Alterando...' : 'Salvar nova senha'}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMostrarAlterarSenha(false)
-                      setNovaSenha('')
-                      setConfirmacaoSenha('')
-                      setMensagem('')
-                    }}
-                    disabled={carregando}
-                    style={{
-                      flex: '1 1 140px',
-                      padding: '13px 18px',
-                    }}
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </section>
-
-       <Notificacao mensagem={mensagem} />
-      </main>
+  if (sessao && perfil && pagina === 'perfil') {
+    return (
+      <PerfilPersonagem
+        perfil={perfil}
+        saldo={saldo}
+        mensagem={mensagem}
+        carregando={carregando}
+        mostrarAlterarSenha={mostrarAlterarSenha}
+        novaSenha={novaSenha}
+        confirmacaoSenha={confirmacaoSenha}
+        setMostrarAlterarSenha={setMostrarAlterarSenha}
+        setNovaSenha={setNovaSenha}
+        setConfirmacaoSenha={setConfirmacaoSenha}
+        alterarSenha={alterarSenha}
+        onAbrirInventario={carregarInventario}
+        onAbrirPets={() => {
+          setPagina('pets')
+          setMensagem('')
+        }}
+        onAbrirDiario={() => {
+          setPagina('diario-personagem')
+          setMensagem('')
+        }}
+        onAbrirCorreio={() => {
+          setPagina('correio-magico')
+          setMensagem('')
+        }}
+        onAbrirConquistas={() => {
+          setPagina('conquistas')
+          setMensagem('')
+        }}
+        onAbrirCertificados={() => {
+          setPagina('certificados')
+          setMensagem('')
+        }}
+        onAbrirMissoes={() => {
+          setPagina('missoes')
+          setMensagem('')
+        }}
+        onAbrirEventos={() => {
+          setPagina('eventos')
+          setMensagem('')
+        }}
+        onAbrirMapa={() => {
+          setPagina('mapa-interativo')
+          setMensagem('')
+        }}
+        onAbrirUploadsPerfil={() => {
+          setPagina('uploads-perfil')
+          setMensagem('')
+        }}        onAbrirPerfilPublico={() => {
+          setPagina('perfil-publico')
+          setMensagem('')
+        }}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+          setMostrarAlterarSenha(false)
+        }}
+      />
     )
   }
 
   if (sessao && perfil && pagina === 'mercado') {
     return (
-      <main
-        style={{
-          maxWidth: '900px',
-          margin: '40px auto',
-          padding: '24px',
+      <Mercado
+        perfil={perfil}
+        saldo={saldo}
+        itens={itensMercado}
+        itemComprando={itemComprando}
+        mensagem={mensagem}
+        onComprar={comprarItem}
+        onAbrirInventario={carregarInventario}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
         }}
-      >
-        <button
-          onClick={() => {
-            setPagina('inicio')
-            setMensagem('')
-          }}
-        >
-          Voltar
-        </button>
-
-        <div
-  style={{
-    textAlign: "center",
-    marginBottom: "35px",
-  }}
->
-  <h1
-    style={{
-      fontSize: "2.7rem",
-      color: "#e5c16b",
-      marginBottom: "10px",
-    }}
-  >
-    Mercado das Cinco Trilhas
-  </h1>
-
-  <p
-    style={{
-      color: "#d9d9d9",
-      fontSize: "1.05rem",
-      marginBottom: "10px",
-    }}
-  >
-    Bem-vindo,
-    <strong> {perfil.nome_personagem || perfil.usuario}</strong>
-  </p>
-
-  <div
-    style={{
-      display: "inline-block",
-      background: "#2d362f",
-      padding: "12px 28px",
-      borderRadius: "999px",
-      border: "1px solid #6d8f61",
-      fontWeight: "bold",
-      fontSize: "1.3rem",
-      color: "#f0d27a",
-    }}
-  >
-    💰 {saldo} Ipês
-  </div>
-</div>
-
-       <Notificacao mensagem={mensagem} />
-
-        {itensMercado.length === 0 ? (
-          <p>
-            Nenhum item foi retornado pelo Supabase. Se os 35 itens aparecem no
-            Table Editor, será necessário liberar a leitura da tabela
-            <strong> items</strong> nas políticas do Supabase.
-          </p>
-        ) : (
-         <div
-  style={{
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-    gap: '20px',
-  }}
->
-  {itensMercado.map((item) => (
-    <CardItem
-      key={item.id}
-      item={item}
-      saldo={saldo}
-      itemComprando={itemComprando}
-      onComprar={comprarItem}
-    />
-  ))}
-</div>
-        )}
-      </main>
+      />
     )
   }
-
   if (sessao && perfil && pagina === 'inventario') {
     return (
-      <main
-        style={{
-          maxWidth: '760px',
-          margin: '40px auto',
-          padding: '24px',
+      <Inventario
+        perfil={perfil}
+        registros={inventario}
+        mensagem={mensagem}
+        onAbrirMercado={carregarMercado}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
         }}
-      >
-        <button
-          onClick={() => {
-            setPagina('inicio')
-            setMensagem('')
-          }}
-        >
-          Voltar
-        </button>
-
-        <h1>Inventário</h1>
-        <p>Itens de {perfil.nome_personagem || perfil.usuario}</p>
-
-        {inventario.length === 0 ? (
-          <p>Seu inventário está vazio.</p>
-        ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '20px',
-            }}
-          >
-            {inventario.map((registro) => (
-              <CardItem
-                key={registro.id}
-                item={registro.item}
-                quantidade={registro.quantidade}
-                modoInventario={true}
-              />
-            ))}
-          </div>
-        )}
-
-       <Notificacao mensagem={mensagem} />
-      </main>
+      />
     )
   }
-
   if (sessao && perfil && pagina === 'transferencia') {
     return (
       <main
@@ -1143,6 +972,263 @@ function App() {
     )
   }
 
+  if (sessao && perfil && pagina === 'aulas') {
+    return (
+      <Aulas
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+        }}
+        onAbrirDisciplina={(disciplinaId) => {
+          setDisciplinaSelecionadaId(disciplinaId)
+          setPagina('disciplina')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+
+  if (
+    sessao &&
+    perfil &&
+    pagina === 'disciplina' &&
+    disciplinaSelecionadaId
+  ) {
+    return (
+      <Disciplina
+        disciplinaId={disciplinaSelecionadaId}
+        onVoltar={() => {
+          setPagina('aulas')
+          setMensagem('')
+        }}
+        onAbrirAula={(aula) => {
+          setAulaSelecionada(aula)
+          setPagina('aula')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+
+  if (sessao && perfil && pagina === 'aula' && aulaSelecionada) {
+    return (
+      <Aula
+        aula={aulaSelecionada}
+        onVoltar={() => {
+          setPagina('disciplina')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+
+  if (sessao && perfil && pagina === 'cms-conteudo') {
+    return (
+      <CmsConteudo
+        perfil={perfil}
+        onVoltar={() => {
+          setPagina('painel-administrativo')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+
+  if (sessao && perfil && pagina === 'uploads-perfil') {
+    return (
+      <UploadsPerfil
+        perfil={perfil}
+        onVoltar={() => {
+          setPagina('perfil')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+  if (sessao && perfil && pagina === 'painel-administrativo') {
+    return (
+      <PainelAdministrativo
+        perfil={perfil}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+  if (sessao && perfil && pagina === 'painel-professor') {
+  return (
+    <PainelProfessor
+      onVoltar={() => {
+        setPagina('inicio')
+        setMensagem('')
+      }}
+    />
+  )
+}
+
+  if (sessao && perfil && pagina === 'pets') {
+    return (
+      <Pets
+        perfil={perfil}
+        onAbrirPet={(registro) => {
+          setPetSelecionado(registro)
+          setPagina('pet-perfil')
+          setMensagem('')
+        }}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+
+  if (sessao && perfil && pagina === 'pet-perfil') {
+    return (
+      <PetPerfil
+        registroInicial={petSelecionado}
+        onVoltar={() => {
+          setPagina('pets')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+  if (sessao && perfil && pagina === 'perfil-publico') {
+    return (
+      <PerfilPublico
+        perfil={perfil}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+
+  if (sessao && perfil && pagina === 'diario-personagem') {
+    return (
+      <DiarioPersonagem
+        perfil={perfil}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+
+  if (sessao && perfil && pagina === 'mapa-interativo') {
+    return (
+      <MapaInterativo
+        perfil={perfil}
+        onAbrirLocal={(local) => {
+          setLocalMapaSelecionado(local)
+          setPagina('local-mapa')
+          setMensagem('')
+        }}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+
+  if (sessao && perfil && pagina === 'local-mapa') {
+    return (
+      <LocalMapa
+        local={localMapaSelecionado}
+        onVoltarMapa={() => {
+          setPagina('mapa-interativo')
+          setMensagem('')
+        }}
+        onNavegar={(destino) => {
+          setPagina(destino)
+          setMensagem('')
+        }}
+      />
+    )
+  }
+  if (sessao && perfil && pagina === 'eventos') {
+    return (
+      <Eventos
+        perfil={perfil}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+  if (sessao && perfil && pagina === 'missoes') {
+    return (
+      <Missoes
+        perfil={perfil}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+  if (sessao && perfil && pagina === 'certificados') {
+    return (
+      <Certificados
+        perfil={perfil}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+  if (sessao && perfil && pagina === 'conquistas') {
+    return (
+      <Conquistas
+        perfil={perfil}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+  if (sessao && perfil && pagina === 'correio-magico') {
+    return (
+      <CorreioMagico
+        perfil={perfil}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+  if (sessao && perfil && pagina === 'quadro-avisos') {
+    return (
+      <QuadroAvisos
+        perfil={perfil}
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+
+  if (sessao && perfil && pagina === 'biblioteca') {
+    return (
+      <Biblioteca
+        onVoltar={() => {
+          setPagina('inicio')
+          setMensagem('')
+        }}
+      />
+    )
+  }
+
   if (sessao && perfil && pagina === 'banco') {
     return (
       <main
@@ -1260,61 +1346,456 @@ function App() {
       </main>
     )
   }
+  if (sessao && perfil && pagina === 'inicio') {
+    return (
+      <>
+        <HomeCastelobruxo
+          perfil={perfil}
+          carregando={carregando}
+          mensagem={mensagem}
+          saldo={saldo}
+          sair={sair}
+          carregarCarteira={carregarCarteira}
+          carregarMercado={carregarMercado}
+          carregarInventario={carregarInventario}
+          setPagina={setPagina}
+          setMensagem={setMensagem}
+        />
 
+        <section className="home-mapa-atalho">
+          <div>
+            <p>Exploração</p>
+            <h2>Mapa Interativo de Castelobruxo</h2>
+            <span>
+              Visite áreas da escola, serviços e regiões de exploração.
+              Cada marcador abre uma página própria do local.
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setPagina('mapa-interativo')
+              setMensagem('')
+            }}
+          >
+            🗺️ Abrir mapa
+          </button>
+        </section>
+      </>
+    )
+  }
   if (sessao && perfil) {
+    const nomeExibido = perfil.nome_personagem || perfil.usuario
+    const cargoExibido = perfil.cargo
+      ? perfil.cargo.charAt(0).toUpperCase() + perfil.cargo.slice(1)
+      : 'Aluno'
+    const triboExibida = perfil.tribo || 'Tribo não definida'
+const cardsSistema = [
+  {
+    titulo: 'Banco da Árvore Ancestral',
+    descricao: 'Consulte seu saldo, extrato e faça transferências.',
+    icone: '🏦',
+    acao: carregarCarteira,
+    ativo: true,
+  },
+  {
+    titulo: 'Mercado das Cinco Trilhas',
+    descricao: 'Descubra itens mágicos e amplie seu inventário.',
+    icone: '🛒',
+    acao: carregarMercado,
+    ativo: true,
+  },
+  {
+    titulo: 'Inventário',
+    descricao: 'Veja os objetos, livros e recursos que você possui.',
+    icone: '🎒',
+    acao: carregarInventario,
+    ativo: true,
+  },
+  {
+    titulo: 'Perfil do Jogador',
+    descricao: 'Acesse seu registro estudantil e suas configurações.',
+    icone: '👤',
+    acao: carregarPerfilJogador,
+    ativo: true,
+  },
+  {
+    titulo: 'Sistema Acadêmico',
+    descricao: 'Acesse seus cursos, disciplinas e aulas disponíveis.',
+    icone: '🎓',
+    acao: () => {
+      setPagina('aulas')
+      setMensagem('')
+    },
+    ativo: true,
+  },
+  {
+    titulo: 'Biblioteca Central',
+    descricao: 'Explore livros, registros e conhecimentos preservados.',
+    icone: '📚',
+    acao: () => {
+      setPagina('biblioteca')
+      setMensagem('')
+    },
+    ativo: true,
+  },
+  {
+    titulo: 'Quadro de Avisos',
+    descricao: 'Leia comunicados da escola, professores, eventos e tribos.',
+    icone: '📜',
+    acao: () => {
+      setPagina('quadro-avisos')
+      setMensagem('')
+    },
+    ativo: true,
+  },
+  {
+    titulo: 'Diário do Personagem',
+    descricao: 'Registre memórias, descobertas, pesquisas e acontecimentos.',
+    icone: '📖',
+    acao: () => {
+      setPagina('diario-personagem')
+      setMensagem('')
+    },
+    ativo: true,
+  },
+  {
+    titulo: 'Perfil Público',
+    descricao: 'Configure e visualize a página pública do seu personagem.',
+    icone: '🌐',
+    acao: () => {
+      setPagina('perfil-publico')
+      setMensagem('')
+    },
+    ativo: true,
+  },
+
+  ...(perfil.cargo === 'professor' ||
+  perfil.cargo === 'administrador'
+    ? [
+        {
+          titulo: 'Painel do Professor',
+          descricao:
+            'Gerencie disciplinas, aulas, livros e atividades.',
+          icone: '👨‍🏫',
+          acao: () => {
+            setPagina('painel-professor')
+            setMensagem('')
+          },
+          ativo: true,
+        },
+      ]
+    : []),
+]
+
     return (
       <main
         style={{
-          maxWidth: '920px',
-          margin: '40px auto',
-          padding: '24px',
+          maxWidth: '1120px',
+          margin: '0 auto',
+          padding: '32px 24px 48px',
         }}
       >
-        <div style={{textAlign:'center',marginBottom:'32px'}}>
-          <h1 style={{fontSize:'3rem',color:'#e5c16b',marginBottom:'8px'}}>Castelobruxo</h1>
-          <p>Escola Brasileira de Magia</p>
-        </div>
+        <header
+          style={{
+            textAlign: 'center',
+            marginBottom: '34px',
+          }}
+        >
+          <img
+            src="/assets/logo/castelobruxo-logo.png"
+            alt="Brasão de Castelobruxo"
+            style={{
+              width: 'min(360px, 86vw)',
+              maxHeight: '330px',
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 18px 34px rgba(0,0,0,.45))',
+            }}
+          />
+        </header>
 
-        <div style={{
-          background:'linear-gradient(180deg, rgba(28,34,29,.98), rgba(17,20,18,.98))',
-          border:'1px solid rgba(201,164,92,.45)',
-          borderRadius:'18px',
-          padding:'24px',
-          marginBottom:'28px'
-        }}>
-          <h2>Bem-vindo, {perfil.nome_personagem || perfil.usuario}!</h2>
-
-          <div style={{
-            display:'grid',
-            gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',
-            gap:'16px',
-            marginTop:'20px'
-          }}>
-            <div><strong>Tribo</strong><br />{perfil.tribo || 'Não definida'}</div>
-            <div><strong>Ano</strong><br />{perfil.ano}</div>
-            <div><strong>Nível</strong><br />{perfil.nivel}</div>
-            <div><strong>XP</strong><br />{perfil.xp}</div>
+        <section
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(220px, 280px) 1fr',
+            gap: '26px',
+            alignItems: 'center',
+            background:
+              'linear-gradient(135deg, rgba(30,39,33,.98), rgba(13,18,15,.98))',
+            border: '1px solid rgba(201,164,92,.45)',
+            borderRadius: '22px',
+            padding: '28px',
+            boxShadow: '0 20px 44px rgba(0,0,0,.38)',
+            marginBottom: '34px',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <div
+              style={{
+                width: '170px',
+                height: '170px',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                display: 'grid',
+                placeItems: 'center',
+                background: 'rgba(201,164,92,.12)',
+                border: '2px solid rgba(229,193,107,.55)',
+                boxShadow: '0 0 28px rgba(229,193,107,.14)',
+                fontSize: '4rem',
+              }}
+            >
+              {perfil.avatar_url ? (
+                <img
+                  src={perfil.avatar_url}
+                  alt={nomeExibido}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    display: 'block',
+                  }}
+                />
+              ) : (
+                '👤'
+              )}
+            </div>
           </div>
-        </div>
 
-        <div style={{
-          display:'grid',
-          gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',
-          gap:'16px'
-        }}>
-          <button onClick={carregarCarteira} disabled={carregando}>{carregando?'Carregando...':'🏦 Banco'}</button>
-          <button onClick={carregarMercado} disabled={carregando}>{carregando?'Carregando...':'🛒 Mercado'}</button>
-          <button onClick={carregarInventario} disabled={carregando}>{carregando?'Carregando...':'🎒 Inventário'}</button>
-          <button onClick={carregarPerfilJogador} disabled={carregando}>{carregando?'Carregando...':'👤 Perfil'}</button>
-          <button disabled>📚 Biblioteca (Em breve)</button>
-        </div>
+          <div>
+            <p
+              style={{
+                color: '#aab7aa',
+                textTransform: 'uppercase',
+                letterSpacing: '.13em',
+                margin: '0 0 8px',
+                fontSize: '.82rem',
+              }}
+            >
+              Bem-vindo de volta
+            </p>
 
-        <div style={{textAlign:'center',marginTop:'36px'}}>
-          <button onClick={sair}>Sair</button>
+            <h1
+              style={{
+                color: '#f3ead2',
+                fontSize: 'clamp(2rem, 5vw, 3.3rem)',
+                margin: '0 0 10px',
+                lineHeight: '1.05',
+              }}
+            >
+              {nomeExibido}
+            </h1>
+
+            <p
+              style={{
+                color: '#e5c16b',
+                fontSize: '1.08rem',
+                margin: 0,
+              }}
+            >
+              {cargoExibido} • {triboExibida}
+            </p>
+
+            <p
+              style={{
+                color: '#aeb9b0',
+                lineHeight: '1.65',
+                margin: '18px 0 0',
+                maxWidth: '620px',
+              }}
+            >
+              Os caminhos de Castelobruxo estão abertos. Escolha um dos sistemas
+              abaixo para continuar sua jornada.
+            </p>
+          </div>
+        </section>
+
+        <section style={{ marginBottom: '36px' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'end',
+              gap: '16px',
+              marginBottom: '18px',
+              flexWrap: 'wrap',
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  color: '#8fa091',
+                  textTransform: 'uppercase',
+                  letterSpacing: '.14em',
+                  fontSize: '.78rem',
+                  margin: '0 0 6px',
+                }}
+              >
+                Navegação
+              </p>
+
+              <h2
+                style={{
+                  color: '#e5c16b',
+                  margin: 0,
+                  fontSize: '2rem',
+                }}
+              >
+                Menu principal
+              </h2>
+            </div>
+          </div>
+
+          <StudentDesk
+            carregando={carregando}
+            onBanco={carregarCarteira}
+            onMercado={carregarMercado}
+            onInventario={carregarInventario}
+            onBiblioteca={() => {
+              setPagina('biblioteca')
+              setMensagem('')
+            }}
+            onDiario={() => {
+              setPagina('diario-personagem')
+              setMensagem('')
+            }}
+            onAvisos={() => {
+              setPagina('quadro-avisos')
+              setMensagem('')
+            }}
+            onPerfil={() => {
+              setPagina('perfil-publico')
+              setMensagem('')
+            }}
+            onAcademico={() => {
+              setPagina('aulas')
+              setMensagem('')
+            }}
+            onPets={() => {
+              setPagina('pets')
+              setMensagem('')
+            }}
+            usuarioId={perfil.id}
+          />
+        </section>
+
+        <section
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(28,34,29,.96), rgba(15,18,16,.96))',
+            border: '1px solid rgba(201,164,92,.3)',
+            borderRadius: '20px',
+            padding: '26px',
+            boxShadow: '0 14px 32px rgba(0,0,0,.3)',
+          }}
+        >
+          <p
+            style={{
+              color: '#8fa091',
+              textTransform: 'uppercase',
+              letterSpacing: '.14em',
+              fontSize: '.78rem',
+              margin: '0 0 6px',
+            }}
+          >
+            Mural da escola
+          </p>
+
+          <h2
+            style={{
+              color: '#e5c16b',
+              margin: '0 0 18px',
+            }}
+          >
+            Notícias de Castelobruxo
+          </h2>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns:
+                'repeat(auto-fit, minmax(min(100%, 220px), 1fr))',
+              gap: '14px',
+            }}
+          >
+            {[
+              ['Período de testes', 'O sistema de Castelobruxo está em evolução.'],
+              ['Biblioteca Central', 'O novo acervo será aberto em breve.'],
+              ['Boas-vindas', 'Explore os sistemas e prepare-se para as aulas.'],
+            ].map(([titulo, descricao]) => (
+              <article
+                key={titulo}
+                style={{
+                  background: 'rgba(35,45,37,.72)',
+                  border: '1px solid rgba(255,255,255,.06)',
+                  borderRadius: '14px',
+                  padding: '17px',
+                }}
+              >
+                <h3
+                  style={{
+                    color: '#f0d27a',
+                    fontSize: '1rem',
+                    margin: '0 0 8px',
+                  }}
+                >
+                  {titulo}
+                </h3>
+
+                <p
+                  style={{
+                    color: '#aeb9b0',
+                    lineHeight: '1.5',
+                    margin: 0,
+                    fontSize: '.93rem',
+                  }}
+                >
+                  {descricao}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <div
+          style={{
+            textAlign: 'center',
+            marginTop: '32px',
+          }}
+        >
+          <button
+            type="button"
+            onClick={sair}
+            style={{
+              minWidth: '150px',
+            }}
+          >
+            Sair
+          </button>
         </div>
 
         <Notificacao mensagem={mensagem} />
       </main>
+    )
+  }
+
+  if (!sessao && modoCadastro) {
+    return (
+      <Cadastro
+        onVoltar={() => {
+          setModoCadastro(false)
+          setMensagem('')
+        }}
+        onCadastroConcluido={() => {
+          setModoCadastro(false)
+          setMensagem('Conta criada com sucesso. Agora faça o login.')
+        }}
+      />
     )
   }
 
@@ -1360,6 +1841,20 @@ function App() {
           {carregando ? 'Entrando...' : 'Entrar'}
         </button>
       </form>
+
+      <button
+        type="button"
+        onClick={() => {
+          setModoCadastro(true)
+          setMensagem('')
+        }}
+        style={{
+          width: '100%',
+          marginTop: '12px',
+        }}
+      >
+        Criar conta
+      </button>
 
      <Notificacao mensagem={mensagem} />
     </main>

@@ -1,0 +1,88 @@
+CASTELOBRUXO — RELATÓRIO DA ETAPA 13.1
+Gerado em: 07/14/2026 01:03:11
+
+ARQUIVOS PRINCIPAIS
+[OK] src\pages\HomeCastelobruxo.jsx
+[OK] src\pages\PerfilPersonagem.jsx
+[OK] src\pages\Mercado.jsx
+[OK] src\pages\Inventario.jsx
+[OK] src\pages\Biblioteca.jsx
+[OK] src\pages\Aulas.jsx
+[OK] src\pages\QuadroAvisos.jsx
+[OK] src\pages\DiarioPersonagem.jsx
+[OK] src\pages\PerfilPublico.jsx
+[OK] src\pages\Pets.jsx
+[OK] src\pages\CorreioMagico.jsx
+[OK] src\pages\Conquistas.jsx
+[OK] src\pages\Certificados.jsx
+[OK] src\pages\Missoes.jsx
+[OK] src\pages\Eventos.jsx
+[OK] src\pages\MapaInterativo.jsx
+[OK] src\pages\LocalMapa.jsx
+[OK] src\pages\PainelAdministrativo.jsx
+
+IMPORTAÇÕES RELATIVAS DO APP.JSX
+[OK] ./services/supabase
+[OK] ./App.css
+[OK] ./components/CardItem
+[OK] ./components/Notificacao
+[OK] ./pages/Cadastro
+[OK] ./pages/Biblioteca
+[OK] ./pages/Aulas
+[OK] ./pages/Disciplina
+[OK] ./pages/Aula
+[OK] ./pages/PainelProfessor
+[OK] ./pages/CriarAula
+[OK] ./pages/QuadroAvisos
+[OK] ./pages/DiarioPersonagem
+[OK] ./pages/PerfilPublico
+[OK] ./pages/HomeCastelobruxo
+[OK] ./components/studentDesk/StudentDesk
+[OK] ./pages/Pets
+[OK] ./pages/PerfilPersonagem
+[OK] ./pages/CorreioMagico
+[OK] ./pages/Conquistas
+[OK] ./pages/Mercado
+[OK] ./pages/Inventario
+[OK] ./pages/Certificados
+[OK] ./pages/Missoes
+[OK] ./pages/Eventos
+[OK] ./pages/MapaInterativo
+[OK] ./pages/LocalMapa
+[OK] ./styles/home-mapa-atalho.css
+[OK] ./pages/PainelAdministrativo
+[OK] ./styles/revisao-etapa-13.css
+
+ROTAS DETECTADAS
+- aula
+- aulas
+- banco
+- biblioteca
+- certificados
+- conquistas
+- correio-magico
+- diario-personagem
+- disciplina
+- eventos
+- extrato
+- inicio
+- inventario
+- local-mapa
+- mapa-interativo
+- mercado
+- missoes
+- painel-administrativo
+- painel-professor
+- perfil
+- perfil-publico
+- pets
+- quadro-avisos
+- transferencia
+
+CORREÇÕES APLICADAS
+- CSS geral responsivo instalado.
+- Props coladas no PerfilPersonagem foram reorganizadas.
+- Backup automático criado.
+
+OBSERVAÇÃO
+Linhas marcadas como FALTA ou IMPORT QUEBRADO devem ser corrigidas na próxima subetapa.

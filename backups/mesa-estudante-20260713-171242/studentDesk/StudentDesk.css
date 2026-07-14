@@ -1,0 +1,161 @@
+.desk-container{
+
+    position:relative;
+
+    width:min(100%,1000px);
+
+    margin:auto;
+
+}
+
+.desk-image{
+
+    width:100%;
+
+    display:block;
+
+    border-radius:20px;
+
+}
+
+.desk-item{
+
+    position:absolute;
+
+    cursor:pointer;
+
+    background:transparent;
+
+    border:none;
+
+    transition:.25s;
+
+}
+
+.desk-item{
+    position:absolute;
+    border:none;
+    background:transparent;
+    cursor:pointer;
+    border-radius:14px;
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        background .25s ease;
+}
+
+.desk-item:hover{
+
+    transform:scale(1.08);
+
+    background:rgba(255,220,120,.08);
+
+    box-shadow:
+        0 0 18px rgba(255,215,100,.45),
+        inset 0 0 12px rgba(255,215,100,.25);
+
+}
+
+.livro{
+
+    left:18%;
+
+    top:43%;
+
+    width:12%;
+
+    height:18%;
+
+}
+
+.mochila{
+
+    right:16%;
+
+    bottom:16%;
+
+    width:15%;
+
+    height:22%;
+
+}
+
+.bolsa{
+
+    left:45%;
+
+    bottom:18%;
+
+    width:13%;
+
+    height:18%;
+
+}
+
+.mapa{
+
+    left:58%;
+
+    top:48%;
+
+    width:16%;
+
+    height:18%;
+
+}
+
+.carta{
+
+    right:22%;
+
+    top:26%;
+
+    width:10%;
+
+    height:12%;
+
+    .desk-hotspot{
+
+    position:absolute;
+
+}
+
+.desk-hotspot span{
+
+    position:absolute;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    bottom:110%;
+
+    white-space:nowrap;
+
+    background:#182118;
+
+    color:#f5f0df;
+
+    padding:8px 12px;
+
+    border-radius:10px;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:.2s;
+
+    font-size:.85rem;
+
+    border:1px solid rgba(229,193,107,.3);
+
+}
+
+.desk-hotspot:hover span{
+
+    opacity:1;
+
+}
+
+}

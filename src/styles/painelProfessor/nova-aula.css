@@ -1,0 +1,191 @@
+.modal-nova-aula-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  overflow-y: auto;
+  background: rgba(3, 7, 4, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+.modal-nova-aula {
+  width: min(760px, 100%);
+  max-height: calc(100vh - 44px);
+  overflow-y: auto;
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(229, 193, 107, 0.08),
+      transparent 36%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(31, 41, 34, 0.995),
+      rgba(13, 19, 15, 0.995)
+    );
+  border: 1px solid rgba(229, 193, 107, 0.38);
+  border-radius: 22px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.58);
+}
+
+.modal-nova-aula-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 24px 26px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.modal-nova-aula-cabecalho p {
+  margin: 0 0 7px;
+  color: #8fa091;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.modal-nova-aula-cabecalho h2 {
+  margin: 0 0 7px;
+  color: #e5c16b;
+  font-size: 2rem;
+}
+
+.modal-nova-aula-cabecalho span {
+  color: #aeb9b0;
+  line-height: 1.5;
+}
+
+.modal-nova-aula-fechar {
+  flex: 0 0 auto;
+  padding: 9px 12px;
+}
+
+.modal-nova-aula-formulario {
+  display: grid;
+  gap: 18px;
+  padding: 24px 26px 26px;
+}
+
+.modal-nova-aula-campo {
+  display: grid;
+  gap: 8px;
+}
+
+.modal-nova-aula-campo > span {
+  color: #d8c489;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.modal-nova-aula-campo input,
+.modal-nova-aula-campo textarea,
+.modal-nova-aula-campo select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  color: #eee6d8;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  outline: none;
+  font: inherit;
+}
+
+.modal-nova-aula-campo textarea {
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.modal-nova-aula-campo input:focus,
+.modal-nova-aula-campo textarea:focus,
+.modal-nova-aula-campo select:focus {
+  background: rgba(201, 164, 92, 0.055);
+  border-color: rgba(229, 193, 107, 0.55);
+}
+
+.modal-nova-aula-campo select option {
+  color: #eee6d8;
+  background: #182019;
+}
+
+.modal-nova-aula-linha {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.modal-nova-aula-resumo {
+  display: grid;
+  gap: 5px;
+  padding: 15px;
+  background: rgba(201, 164, 92, 0.07);
+  border: 1px solid rgba(201, 164, 92, 0.2);
+  border-radius: 13px;
+}
+
+.modal-nova-aula-resumo span {
+  color: #8fa091;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.modal-nova-aula-resumo strong {
+  color: #eee6d8;
+}
+
+.modal-nova-aula-resumo small {
+  color: #9faa9f;
+  line-height: 1.5;
+}
+
+.modal-nova-aula-erro {
+  margin: 0;
+  padding: 13px 15px;
+  color: #efb1a8;
+  background: rgba(180, 72, 61, 0.1);
+  border: 1px solid rgba(218, 104, 92, 0.3);
+  border-radius: 12px;
+}
+
+.modal-nova-aula-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 3px;
+}
+
+@media (max-width: 720px) {
+  .modal-nova-aula-fundo {
+    padding: 10px;
+    place-items: start center;
+  }
+
+  .modal-nova-aula {
+    max-height: calc(100vh - 20px);
+  }
+
+  .modal-nova-aula-cabecalho {
+    padding: 20px;
+  }
+
+  .modal-nova-aula-formulario {
+    padding: 20px;
+  }
+
+  .modal-nova-aula-linha {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-nova-aula-acoes {
+    flex-direction: column-reverse;
+  }
+
+  .modal-nova-aula-acoes button {
+    width: 100%;
+  }
+}

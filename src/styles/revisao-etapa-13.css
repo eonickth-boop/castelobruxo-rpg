@@ -1,0 +1,106 @@
+/* CASTELOBRUXO — ETAPA 13.1
+   Revisão estrutural e ajustes gerais para telas menores. */
+
+html {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+main {
+  min-width: 0;
+}
+
+.cb-revisao-aviso {
+  width: min(920px, calc(100% - 32px));
+  margin: 18px auto;
+  padding: 14px 16px;
+  color: #eee7d7;
+  background: rgba(29, 39, 32, .96);
+  border: 1px solid rgba(201, 164, 92, .32);
+  border-radius: 12px;
+}
+
+@media (max-width: 980px) {
+  body.cb-com-sidebar {
+    padding-left: 0 !important;
+  }
+
+  .cb-sidebar-global {
+    max-width: min(86vw, 320px);
+  }
+
+  main {
+    width: min(100% - 20px, 1240px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  body {
+    font-size: 15px;
+  }
+
+  main {
+    width: min(100% - 16px, 1240px);
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  h1 {
+    overflow-wrap: anywhere;
+  }
+
+  table {
+    min-width: 720px;
+  }
+
+  .admin-tabela-wrap,
+  [class*="tabela-wrap"],
+  [class*="table-wrap"] {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  form {
+    max-width: 100%;
+  }
+
+  button {
+    min-height: 42px;
+  }
+
+  .eventos-filtros,
+  .admin-abas,
+  [class*="filtros"] {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .eventos-filtros button,
+  .admin-abas button,
+  [class*="filtros"] button {
+    flex: 0 0 auto;
+  }
+}

@@ -1,0 +1,282 @@
+/* CASTELOBRUXO — ETAPA 13.2.1
+   Refinamento visual e mobile da Home. */
+
+.cb-home {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 56px;
+}
+
+.cb-home-boas-vindas,
+.cb-home-mesa-area,
+.cb-home-noticias {
+  scroll-margin-top: 88px;
+}
+
+.cb-home-boas-vindas {
+  position: relative;
+}
+
+.cb-home-logo-flutuante img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.cb-home-avatar {
+  overflow: hidden;
+}
+
+.cb-home-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cb-home-avatar span {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: transparent;
+  position: relative;
+}
+
+.cb-home-avatar span::before {
+  content: '';
+  width: 48%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #7891a6, #526f86);
+  box-shadow: 0 8px 18px rgba(0,0,0,.15);
+  transform: translateY(-18%);
+}
+
+.cb-home-avatar span::after {
+  content: '';
+  position: absolute;
+  width: 66%;
+  height: 34%;
+  bottom: 13%;
+  border-radius: 50% 50% 20% 20%;
+  background: linear-gradient(180deg, #7891a6, #526f86);
+  box-shadow: 0 8px 18px rgba(0,0,0,.12);
+}
+
+.cb-home-noticias-grade article {
+  min-width: 0;
+}
+
+.cb-home-noticias-grade h3,
+.cb-home-noticias-grade p {
+  overflow-wrap: anywhere;
+}
+
+.home-mapa-atalho {
+  margin-top: 22px;
+}
+
+@media (max-width: 720px) {
+  .cb-home {
+    width: 100%;
+    padding: 0 0 28px;
+  }
+
+  .cb-home-boas-vindas {
+    padding-top: 68px;
+  }
+
+  .cb-home-logo-flutuante {
+    width: min(54vw, 220px);
+    margin: 0 auto -34px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .cb-home-papel {
+    width: calc(100% - 18px);
+    margin: 0 auto;
+    padding: 112px 20px 28px;
+    border-radius: 22px;
+  }
+
+  .cb-home-avatar {
+    width: 118px;
+    height: 152px;
+    margin: 0 auto 24px;
+    border-radius: 18px;
+  }
+
+  .cb-home-texto {
+    text-align: center;
+  }
+
+  .cb-home-texto small {
+    font-size: .76rem;
+    letter-spacing: .14em;
+  }
+
+  .cb-home-texto h1 {
+    margin: 8px 0 6px;
+    font-size: clamp(2rem, 10vw, 3rem);
+    line-height: 1;
+  }
+
+  .cb-home-texto strong {
+    display: block;
+    font-size: 1rem;
+  }
+
+  .cb-home-texto p {
+    max-width: 29ch;
+    margin: 20px auto 0;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .cb-home-mesa-area {
+    margin-top: 28px;
+    padding: 0 2px;
+  }
+
+  .cb-home-secao-cabecalho {
+    padding: 28px 18px 18px;
+    text-align: center;
+  }
+
+  .cb-home-secao-cabecalho > div:first-child {
+    width: 100%;
+  }
+
+  .cb-home-secao-cabecalho h2 {
+    font-size: clamp(2.2rem, 11vw, 3.3rem);
+    line-height: 1;
+  }
+
+  .cb-home-resumo {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .cb-home-resumo span {
+    min-width: 0;
+    padding: 10px 8px;
+    text-align: center;
+    font-size: .84rem;
+    white-space: normal;
+  }
+
+  .cb-home-mesa-moldura {
+    width: calc(100% - 18px);
+    margin: 0 auto;
+    padding: 10px;
+    border-radius: 20px;
+  }
+
+  .cb-home-noticias {
+    width: calc(100% - 18px);
+    margin: 28px auto 0;
+    padding: 28px 16px 20px;
+    border-radius: 24px;
+  }
+
+  .cb-home-noticias header {
+    margin-bottom: 20px;
+  }
+
+  .cb-home-noticias header h2 {
+    margin-top: 8px;
+    font-size: clamp(2rem, 10vw, 3rem);
+    line-height: 1.02;
+  }
+
+  .cb-home-noticias-grade {
+    gap: 12px;
+  }
+
+  .cb-home-noticias-grade article {
+    padding: 20px 16px;
+    min-height: 0;
+  }
+
+  .cb-home-noticias-grade article > span {
+    font-size: 2rem;
+  }
+
+  .cb-home-noticias-grade h3 {
+    margin: 10px 0 8px;
+    font-size: 1.22rem;
+  }
+
+  .cb-home-noticias-grade p {
+    margin: 0;
+    font-size: .96rem;
+    line-height: 1.45;
+  }
+
+  .cb-home-sair {
+    width: 100%;
+    margin-top: 18px;
+  }
+
+  .home-mapa-atalho {
+    width: calc(100% - 18px);
+    margin: 28px auto 0;
+    padding: 24px 18px;
+    border-radius: 22px;
+  }
+
+  .home-mapa-atalho p {
+    text-align: center;
+  }
+
+  .home-mapa-atalho h2 {
+    text-align: center;
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+    line-height: 1.1;
+  }
+
+  .home-mapa-atalho span {
+    display: block;
+    text-align: center;
+    font-size: .98rem;
+    line-height: 1.5;
+  }
+
+  .home-mapa-atalho button {
+    margin-top: 6px;
+  }
+
+  .cb-sidebar-toggle {
+    top: 16px !important;
+    left: 16px !important;
+    z-index: 9999 !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .cb-home-papel {
+    padding-top: 102px;
+  }
+
+  .cb-home-logo-flutuante {
+    width: min(58vw, 205px);
+  }
+
+  .cb-home-avatar {
+    width: 108px;
+    height: 138px;
+  }
+
+  .cb-home-resumo {
+    grid-template-columns: 1fr;
+  }
+
+  .cb-home-resumo span {
+    font-size: .92rem;
+  }
+}
