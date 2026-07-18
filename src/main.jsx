@@ -6,7 +6,6 @@ const root = createRoot(document.getElementById('root'))
 
 function mostrarErro(error) {
   console.error('Falha ao iniciar Castelobruxo:', error)
-
   root.render(
     <main style={{ maxWidth: '760px', margin: '60px auto', padding: '28px', color: '#eee7d7', background: 'rgba(17, 25, 20, .96)', border: '1px solid rgba(201, 164, 92, .45)', borderRadius: '18px', fontFamily: 'system-ui, sans-serif' }}>
       <h1 style={{ color: '#e5c16b' }}>Castelobruxo não conseguiu iniciar</h1>
@@ -24,6 +23,7 @@ async function iniciar() {
     const paginaTribos = window.location.pathname.startsWith('/tribos')
     const paginaComunidade = window.location.pathname.startsWith('/comunidade')
     const paginaChat = window.location.pathname.startsWith('/chat')
+    const paginaMural = window.location.pathname.startsWith('/mural')
     const { default: SidebarGlobal } = await import('./components/layout/SidebarGlobal.jsx')
 
     if (paginaRpg) {
@@ -49,6 +49,12 @@ async function iniciar() {
     if (paginaChat) {
       const { default: ChatPrivadoStandalone } = await import('./pages/ChatPrivadoStandalone.jsx')
       root.render(<StrictMode><SidebarGlobal /><ChatPrivadoStandalone /></StrictMode>)
+      return
+    }
+
+    if (paginaMural) {
+      const { default: MuralComunidadeStandalone } = await import('./pages/MuralComunidadeStandalone.jsx')
+      root.render(<StrictMode><SidebarGlobal /><MuralComunidadeStandalone /></StrictMode>)
       return
     }
 
