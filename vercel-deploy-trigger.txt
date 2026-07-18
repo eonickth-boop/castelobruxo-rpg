@@ -1,0 +1,1 @@
+Este arquivo existe apenas para disparar um novo deploy automático na Vercel após reconectar o repositório.
