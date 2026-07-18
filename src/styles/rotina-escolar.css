@@ -7,6 +7,7 @@
 
 .rotina-topo{
   position:relative;
+  isolation:isolate;
   display:flex;
   justify-content:space-between;
   gap:24px;
@@ -22,14 +23,21 @@
   overflow:hidden;
 }
 
+.rotina-topo>*{
+  position:relative;
+  z-index:2;
+}
+
 .rotina-topo::after{
   content:'';
   position:absolute;
   inset:auto -70px -90px auto;
+  z-index:1;
   width:240px;
   height:240px;
   border:1px solid rgba(226,188,100,.12);
   border-radius:50%;
+  pointer-events:none;
 }
 
 .rotina-topo h1{
@@ -45,6 +53,8 @@
 .rotina-topo p{max-width:680px;margin:0;line-height:1.65}
 
 .rotina-topo button,.rotina-form button,.rotina-atalhos button,.rotina-proximos button{
+  position:relative;
+  z-index:3;
   border:1px solid rgba(218,178,89,.45);
   background:linear-gradient(180deg,#314138,#1d2921);
   color:#f7e8bd;
@@ -54,6 +64,7 @@
   cursor:pointer;
   box-shadow:0 8px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.05);
   transition:transform .16s ease,border-color .16s ease,background .16s ease;
+  pointer-events:auto;
 }
 
 .rotina-topo button:hover,.rotina-form button:hover,.rotina-atalhos button:hover,.rotina-proximos button:hover{
@@ -89,6 +100,7 @@
   bottom:-34px;
   border-radius:50%;
   background:rgba(224,184,88,.07);
+  pointer-events:none;
 }
 
 .rotina-resumo small{display:block;color:#99a79d;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}
