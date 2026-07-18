@@ -21,9 +21,7 @@ function mostrarErro(error) {
       }}
     >
       <h1 style={{ color: '#e5c16b' }}>Castelobruxo não conseguiu iniciar</h1>
-      <p>
-        A publicação foi concluída, mas ocorreu um erro ao carregar o aplicativo.
-      </p>
+      <p>A publicação foi concluída, mas ocorreu um erro ao carregar o aplicativo.</p>
       <pre
         style={{
           whiteSpace: 'pre-wrap',
@@ -50,12 +48,16 @@ async function iniciar() {
     )
 
     if (paginaRpg) {
-      const { default: RpgCenas } = await import('./pages/RpgCenas.jsx')
+      const [{ default: RpgCenas }, { default: PainelTestesGlobal }] = await Promise.all([
+        import('./pages/RpgCenas.jsx'),
+        import('./components/rpg/PainelTestesGlobal.jsx'),
+      ])
 
       root.render(
         <StrictMode>
           <SidebarGlobal />
           <RpgCenas />
+          <PainelTestesGlobal />
         </StrictMode>,
       )
       return
