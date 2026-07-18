@@ -3,56 +3,47 @@ import { supabase } from '../../services/supabase'
 import '../../styles/layout/sidebarGlobal.css'
 
 const gruposBase = [
-  {
-    titulo: 'Principal',
-    itens: [
-      { id: 'inicio', icone: '🏠', rotulo: 'Início' },
-      { id: 'perfil', icone: '👤', rotulo: 'Meu Perfil' },
-      { id: 'perfil-publico', icone: '🌐', rotulo: 'Perfil Público' },
-      { id: 'diario-personagem', icone: '📖', rotulo: 'Diário' },
-      { id: 'pets', icone: '🐾', rotulo: 'Companheiros' },
-    ],
-  },
-  {
-    titulo: 'Escola',
-    itens: [
-      { id: 'aulas', icone: '🎓', rotulo: 'Sistema Acadêmico' },
-      { id: 'biblioteca', icone: '📚', rotulo: 'Biblioteca' },
-      { id: 'quadro-avisos', icone: '📜', rotulo: 'Quadro de Avisos' },
-    ],
-  },
-  {
-    titulo: 'Exploração',
-    itens: [
-      { id: 'mapa-interativo', icone: '🗺️', rotulo: 'Mapa Interativo' },
-      { id: 'missoes', icone: '🧭', rotulo: 'Missões' },
-      { id: 'eventos', icone: '📅', rotulo: 'Eventos' },
-    ],
-  },
-  {
-    titulo: 'Economia',
-    itens: [
-      { id: 'banco', icone: '🏦', rotulo: 'Banco' },
-      { id: 'mercado', icone: '🛒', rotulo: 'Mercado' },
-      { id: 'inventario', icone: '🎒', rotulo: 'Inventário' },
-    ],
-  },
-  {
-    titulo: 'Registros',
-    itens: [
-      { id: 'correio-magico', icone: '✉️', rotulo: 'Correio Mágico' },
-      { id: 'conquistas', icone: '🏆', rotulo: 'Conquistas' },
-      { id: 'certificados', icone: '📜', rotulo: 'Certificados' },
-    ],
-  },
+  { titulo: 'Principal', itens: [
+    { id: 'inicio', icone: '🏠', rotulo: 'Início' },
+    { id: 'perfil', icone: '👤', rotulo: 'Meu Perfil' },
+    { id: 'perfil-publico', icone: '🌐', rotulo: 'Perfil Público' },
+    { id: 'diario-personagem', icone: '📖', rotulo: 'Diário' },
+    { id: 'pets', icone: '🐾', rotulo: 'Companheiros' },
+  ]},
+  { titulo: 'Escola', itens: [
+    { id: 'aulas', icone: '🎓', rotulo: 'Sistema Acadêmico' },
+    { id: 'biblioteca', icone: '📚', rotulo: 'Biblioteca' },
+    { id: 'quadro-avisos', icone: '📜', rotulo: 'Quadro de Avisos' },
+  ]},
+  { titulo: 'Interpretação', itens: [
+    { id: 'rpg-textual', icone: '🪶', rotulo: 'RPG Textual', href: '/rpg' },
+  ]},
+  { titulo: 'Exploração', itens: [
+    { id: 'mapa-interativo', icone: '🗺️', rotulo: 'Mapa Interativo' },
+    { id: 'missoes', icone: '🧭', rotulo: 'Missões' },
+    { id: 'eventos', icone: '📅', rotulo: 'Eventos' },
+  ]},
+  { titulo: 'Economia', itens: [
+    { id: 'banco', icone: '🏦', rotulo: 'Banco' },
+    { id: 'mercado', icone: '🛒', rotulo: 'Mercado' },
+    { id: 'inventario', icone: '🎒', rotulo: 'Inventário' },
+  ]},
+  { titulo: 'Registros', itens: [
+    { id: 'correio-magico', icone: '✉️', rotulo: 'Correio Mágico' },
+    { id: 'conquistas', icone: '🏆', rotulo: 'Conquistas' },
+    { id: 'certificados', icone: '📜', rotulo: 'Certificados' },
+  ]},
 ]
 
-function navegar(destino) {
-  window.dispatchEvent(
-    new CustomEvent('castelobruxo:navegar', {
-      detail: { pagina: destino },
-    }),
-  )
+function navegar(item) {
+  if (item.href) {
+    window.location.href = item.href
+    return
+  }
+
+  window.dispatchEvent(new CustomEvent('castelobruxo:navegar', {
+    detail: { pagina: item.id },
+  }))
 }
 
 export default function SidebarGlobal() {
@@ -93,12 +84,10 @@ export default function SidebarGlobal() {
 
     iniciar()
 
-    const { data } = supabase.auth.onAuthStateChange(
-      async (_evento, novaSessao) => {
-        setSessao(novaSessao)
-        await carregarPerfilDaSessao(novaSessao)
-      },
-    )
+    const { data } = supabase.auth.onAuthStateChange(async (_evento, novaSessao) => {
+      setSessao(novaSessao)
+      await carregarPerfilDaSessao(novaSessao)
+    })
 
     const ouvirPagina = (evento) => {
       if (evento.detail?.pagina) {
@@ -119,41 +108,20 @@ export default function SidebarGlobal() {
   useEffect(() => {
     const deveExibir = Boolean(sessao && perfil)
     document.body.classList.toggle('cb-com-sidebar', deveExibir)
-
-    return () => {
-      document.body.classList.remove('cb-com-sidebar')
-    }
+    return () => document.body.classList.remove('cb-com-sidebar')
   }, [sessao, perfil])
 
   const grupos = useMemo(() => {
-    if (!perfil) return gruposBase
+    if (!perfil || !['professor', 'administrador'].includes(perfil.cargo)) return gruposBase
 
-    if (perfil.cargo === 'professor' || perfil.cargo === 'administrador') {
-      return [
-        ...gruposBase,
-        {
-          titulo: 'Gestão',
-          itens: [
-            {
-              id: 'painel-professor',
-              icone: '👨‍🏫',
-              rotulo: 'Painel do Professor',
-            },            {
-              id: 'painel-administrativo',
-              icone: '🛡️',
-              rotulo: 'Painel Administrativo',
-            },
-            {
-              id: 'cms-conteudo',
-              icone: '🧰',
-              rotulo: 'CMS de Conteúdo',
-            },
-          ],
-        },
-      ]
-    }
-
-    return gruposBase
+    return [...gruposBase, {
+      titulo: 'Gestão',
+      itens: [
+        { id: 'painel-professor', icone: '👨‍🏫', rotulo: 'Painel do Professor' },
+        { id: 'painel-administrativo', icone: '🛡️', rotulo: 'Painel Administrativo' },
+        { id: 'cms-conteudo', icone: '🧰', rotulo: 'CMS de Conteúdo' },
+      ],
+    }]
   }, [perfil])
 
   if (!sessao || !perfil) return null
@@ -162,40 +130,18 @@ export default function SidebarGlobal() {
 
   return (
     <>
-      <button
-        type="button"
-        className="cb-sidebar-toggle"
-        onClick={() => setAberta((valor) => !valor)}
-        aria-label="Abrir menu"
-      >
-        ☰
-      </button>
-
-      {aberta && (
-        <button
-          type="button"
-          className="cb-sidebar-overlay"
-          onClick={() => setAberta(false)}
-          aria-label="Fechar menu"
-        />
-      )}
+      <button type="button" className="cb-sidebar-toggle" onClick={() => setAberta((valor) => !valor)} aria-label="Abrir menu">☰</button>
+      {aberta && <button type="button" className="cb-sidebar-overlay" onClick={() => setAberta(false)} aria-label="Fechar menu" />}
 
       <aside className={`cb-sidebar-global ${aberta ? 'cb-sidebar-aberta' : ''}`}>
         <header className="cb-sidebar-perfil">
           <div className="cb-sidebar-avatar">
-            {perfil.avatar_url ? (
-              <img src={perfil.avatar_url} alt={nome} />
-            ) : (
-              <span>👤</span>
-            )}
+            {perfil.avatar_url ? <img src={perfil.avatar_url} alt={nome} /> : <span>👤</span>}
           </div>
-
           <div>
             <small>Estudante</small>
             <strong>{nome}</strong>
-            <span>
-              {perfil.tribo || 'Sem tribo'} · Nível {perfil.nivel || 1}
-            </span>
+            <span>{perfil.tribo || 'Sem tribo'} · Nível {perfil.nivel || 1}</span>
           </div>
         </header>
 
@@ -203,17 +149,12 @@ export default function SidebarGlobal() {
           {grupos.map((grupo) => (
             <section key={grupo.titulo}>
               <h3>{grupo.titulo}</h3>
-
               {grupo.itens.map((item) => (
                 <button
                   key={item.id}
                   type="button"
-                  className={
-                    paginaAtual === item.id
-                      ? 'cb-sidebar-item cb-sidebar-item-ativo'
-                      : 'cb-sidebar-item'
-                  }
-                  onClick={() => navegar(item.id)}
+                  className={paginaAtual === item.id ? 'cb-sidebar-item cb-sidebar-item-ativo' : 'cb-sidebar-item'}
+                  onClick={() => navegar(item)}
                 >
                   <span>{item.icone}</span>
                   <strong>{item.rotulo}</strong>
