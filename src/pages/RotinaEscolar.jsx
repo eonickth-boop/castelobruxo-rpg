@@ -11,11 +11,13 @@ const TIPOS = {
 function inicioDoMes(data) { return new Date(data.getFullYear(), data.getMonth(), 1) }
 function fimDoMes(data) { return new Date(data.getFullYear(), data.getMonth() + 1, 0, 23, 59, 59) }
 function chaveDia(data) { return new Date(data).toISOString().slice(0, 10) }
+function dataValida(valor) { return valor && !Number.isNaN(new Date(valor).getTime()) }
 
 export default function RotinaEscolar({ perfil, onVoltar, onAbrirEventos, onAbrirMissoes, onAbrirAulas }) {
   const [mes, setMes] = useState(inicioDoMes(new Date()))
   const [itens, setItens] = useState([])
   const [carregando, setCarregando] = useState(true)
+  const [salvando, setSalvando] = useState(false)
   const [mensagem, setMensagem] = useState('')
   const [formAberto, setFormAberto] = useState(false)
   const [novo, setNovo] = useState({ titulo: '', descricao: '', tipo: 'estudo', inicio_em: '', fim_em: '', local_nome: '' })
@@ -40,15 +42,34 @@ export default function RotinaEscolar({ perfil, onVoltar, onAbrirEventos, onAbri
   }
 
   async function criar(evento) {
-    evento.preventDefault(); setMensagem('')
-    const { error } = await supabase.from('rotina_compromissos').insert({
-      usuario_id: perfil.id, titulo: novo.titulo.trim(), descricao: novo.descricao.trim(), tipo: novo.tipo,
-      inicio_em: new Date(novo.inicio_em).toISOString(), fim_em: novo.fim_em ? new Date(novo.fim_em).toISOString() : null,
-      local_nome: novo.local_nome.trim() || null,
+    evento.preventDefault()
+    setMensagem('')
+
+    const titulo = novo.titulo.trim()
+    if (titulo.length < 2) { setMensagem('Informe um título com pelo menos 2 caracteres.'); return }
+    if (!dataValida(novo.inicio_em)) { setMensagem('Informe a data e o horário de início.'); return }
+    if (novo.fim_em && !dataValida(novo.fim_em)) { setMensagem('A data de término é inválida.'); return }
+
+    const inicio = new Date(novo.inicio_em)
+    const fim = novo.fim_em ? new Date(novo.fim_em) : null
+    if (fim && fim < inicio) { setMensagem('O término não pode acontecer antes do início.'); return }
+
+    setSalvando(true)
+    const { error } = await supabase.rpc('criar_compromisso_rotina', {
+      p_titulo: titulo,
+      p_descricao: novo.descricao.trim(),
+      p_tipo: novo.tipo,
+      p_inicio_em: inicio.toISOString(),
+      p_fim_em: fim ? fim.toISOString() : null,
+      p_local_nome: novo.local_nome.trim() || null,
     })
+    setSalvando(false)
+
     if (error) { setMensagem(error.message || 'Não foi possível salvar o compromisso.'); return }
     setNovo({ titulo: '', descricao: '', tipo: 'estudo', inicio_em: '', fim_em: '', local_nome: '' })
-    setFormAberto(false); setMensagem('Compromisso adicionado à rotina.'); await carregar()
+    setFormAberto(false)
+    setMensagem('Compromisso adicionado à rotina.')
+    await carregar()
   }
 
   async function alternarConcluido(item) {
@@ -75,7 +96,7 @@ export default function RotinaEscolar({ perfil, onVoltar, onAbrirEventos, onAbri
   const proximos = itens.filter((item) => new Date(item.inicio_em) >= new Date()).slice(0, 6)
 
   return <main className="rotina-pagina">
-    <header className="rotina-topo"><button onClick={onVoltar}>← Voltar</button><div><small>Vida escolar</small><h1>Rotina e calendário</h1><p>Organize aulas, estudos, eventos, missões e compromissos pessoais.</p></div><button onClick={() => setFormAberto((v) => !v)}>Novo compromisso</button></header>
+    <header className="rotina-topo"><button onClick={onVoltar}>← Voltar</button><div><small>Vida escolar</small><h1>Rotina e calendário</h1><p>Organize aulas, estudos, eventos, missões e compromissos pessoais.</p></div><button onClick={() => { setFormAberto((v) => !v); setMensagem('') }}>Novo compromisso</button></header>
 
     <section className="rotina-resumo">
       <article><small>Próximos compromissos</small><strong>{proximos.length}</strong></article>
@@ -88,10 +109,10 @@ export default function RotinaEscolar({ perfil, onVoltar, onAbrirEventos, onAbri
       <input required minLength="2" maxLength="120" placeholder="Título" value={novo.titulo} onChange={(e) => setNovo({ ...novo, titulo: e.target.value })} />
       <select value={novo.tipo} onChange={(e) => setNovo({ ...novo, tipo: e.target.value })}>{Object.entries(TIPOS).filter(([chave]) => !['evento','missao'].includes(chave)).map(([chave, nome]) => <option key={chave} value={chave}>{nome}</option>)}</select>
       <input required type="datetime-local" value={novo.inicio_em} onChange={(e) => setNovo({ ...novo, inicio_em: e.target.value })} />
-      <input type="datetime-local" value={novo.fim_em} onChange={(e) => setNovo({ ...novo, fim_em: e.target.value })} />
+      <input type="datetime-local" min={novo.inicio_em || undefined} value={novo.fim_em} onChange={(e) => setNovo({ ...novo, fim_em: e.target.value })} />
       <input placeholder="Local" value={novo.local_nome} onChange={(e) => setNovo({ ...novo, local_nome: e.target.value })} />
       <textarea rows="3" maxLength="500" placeholder="Descrição" value={novo.descricao} onChange={(e) => setNovo({ ...novo, descricao: e.target.value })} />
-      <button type="submit">Salvar na agenda</button>
+      <button type="submit" disabled={salvando}>{salvando ? 'Salvando...' : 'Salvar na agenda'}</button>
     </form>}
 
     <div className="rotina-layout">
