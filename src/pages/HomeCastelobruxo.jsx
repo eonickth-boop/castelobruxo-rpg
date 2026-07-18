@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../services/supabase'
 import StudentDesk from '../components/studentDesk/StudentDesk'
+import PainelAlunoVivo from '../components/home/PainelAlunoVivo'
 import '../styles/homeCastelobruxo.css'
-
 import '../styles/homeFinalAdjustments.css'
+
 export default function HomeCastelobruxo({
   perfil,
   carregando,
@@ -95,6 +96,12 @@ export default function HomeCastelobruxo({
           <span className="cb-home-prego cb-home-prego-2" />
         </div>
       </section>
+
+      <PainelAlunoVivo
+        perfil={perfil}
+        saldo={saldoAtual}
+        navegar={navegar}
+      />
 
       <section className="cb-home-mesa-area">
         <header className="cb-home-secao-cabecalho">
