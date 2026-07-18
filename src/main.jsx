@@ -48,9 +48,14 @@ async function iniciar() {
     )
 
     if (paginaRpg) {
-      const [{ default: RpgCenas }, { default: PainelTestesGlobal }] = await Promise.all([
+      const [
+        { default: RpgCenas },
+        { default: PainelTestesGlobal },
+        { default: PainelItensGlobal },
+      ] = await Promise.all([
         import('./pages/RpgCenas.jsx'),
         import('./components/rpg/PainelTestesGlobal.jsx'),
+        import('./components/rpg/PainelItensGlobal.jsx'),
       ])
 
       root.render(
@@ -58,6 +63,7 @@ async function iniciar() {
           <SidebarGlobal />
           <RpgCenas />
           <PainelTestesGlobal />
+          <PainelItensGlobal />
         </StrictMode>,
       )
       return
