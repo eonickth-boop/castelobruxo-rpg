@@ -8,6 +8,7 @@ const gruposBase = [
     { id: 'perfil', icone: '👤', rotulo: 'Meu Perfil' },
     { id: 'perfil-publico', icone: '🌐', rotulo: 'Perfil Público' },
     { id: 'comunidade-social', icone: '🤝', rotulo: 'Comunidade', href: '/comunidade' },
+    { id: 'mural-comunidade', icone: '📌', rotulo: 'Mural Social', href: '/mural' },
     { id: 'chat-privado', icone: '💬', rotulo: 'Chat Privado', href: '/chat' },
     { id: 'diario-personagem', icone: '📖', rotulo: 'Diário' },
     { id: 'pets', icone: '🐾', rotulo: 'Companheiros' },
@@ -40,10 +41,7 @@ const gruposBase = [
 ]
 
 function navegar(item) {
-  if (item.href) {
-    window.location.href = item.href
-    return
-  }
+  if (item.href) { window.location.href = item.href; return }
   window.dispatchEvent(new CustomEvent('castelobruxo:navegar', { detail: { pagina: item.id } }))
 }
 
@@ -56,6 +54,7 @@ export default function SidebarGlobal() {
     if (window.location.pathname.startsWith('/rotina')) return 'rotina-escolar'
     if (window.location.pathname.startsWith('/tribos')) return 'tribos-completas'
     if (window.location.pathname.startsWith('/comunidade')) return 'comunidade-social'
+    if (window.location.pathname.startsWith('/mural')) return 'mural-comunidade'
     if (window.location.pathname.startsWith('/chat')) return 'chat-privado'
     return 'inicio'
   })
