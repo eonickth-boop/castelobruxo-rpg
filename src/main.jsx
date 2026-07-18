@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import { iniciarPontePerfilSocial } from './socialProfileBridge.jsx'
 
 const root = createRoot(document.getElementById('root'))
 
@@ -95,6 +96,7 @@ async function iniciar() {
 
     const { default: App } = await import('./App.jsx')
     root.render(<StrictMode><SidebarGlobal /><App /></StrictMode>)
+    iniciarPontePerfilSocial()
 
     const destino = new URLSearchParams(window.location.search).get('pagina')
     if (destino) {
