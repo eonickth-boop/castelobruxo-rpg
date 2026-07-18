@@ -88,6 +88,11 @@ async function iniciar() {
       await renderizarPagina(Pagina, SidebarGlobal)
       return
     }
+    if (path.startsWith('/exploracao') || path.startsWith('/colecoes')) {
+      const { default: Pagina } = await import('./pages/ExploracaoColecoesStandalone.jsx')
+      await renderizarPagina(Pagina, SidebarGlobal)
+      return
+    }
 
     if (path.startsWith('/dormitorio')) {
       window.location.replace('/')
