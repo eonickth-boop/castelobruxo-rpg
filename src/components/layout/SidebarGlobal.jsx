@@ -11,6 +11,7 @@ const gruposBase = [
     { id: 'pets', icone: '🐾', rotulo: 'Companheiros' },
   ]},
   { titulo: 'Escola', itens: [
+    { id: 'rotina-escolar', icone: '🗓️', rotulo: 'Rotina Escolar', href: '/rotina' },
     { id: 'aulas', icone: '🎓', rotulo: 'Sistema Acadêmico' },
     { id: 'biblioteca', icone: '📚', rotulo: 'Biblioteca' },
     { id: 'quadro-avisos', icone: '📜', rotulo: 'Quadro de Avisos' },
@@ -50,7 +51,11 @@ export default function SidebarGlobal() {
   const [sessao, setSessao] = useState(null)
   const [perfil, setPerfil] = useState(null)
   const [aberta, setAberta] = useState(false)
-  const [paginaAtual, setPaginaAtual] = useState('inicio')
+  const [paginaAtual, setPaginaAtual] = useState(() => {
+    if (window.location.pathname.startsWith('/rpg')) return 'rpg-textual'
+    if (window.location.pathname.startsWith('/rotina')) return 'rotina-escolar'
+    return 'inicio'
+  })
 
   useEffect(() => {
     let ativo = true
