@@ -43,6 +43,7 @@ function mostrarErro(error) {
 async function iniciar() {
   try {
     const paginaRpg = window.location.pathname.startsWith('/rpg')
+    const paginaRotina = window.location.pathname.startsWith('/rotina')
     const { default: SidebarGlobal } = await import(
       './components/layout/SidebarGlobal.jsx'
     )
@@ -73,6 +74,17 @@ async function iniciar() {
           <PainelRecompensasGlobal />
           <PainelNpcsGlobal />
           <PainelCampanhasGlobal />
+        </StrictMode>,
+      )
+      return
+    }
+
+    if (paginaRotina) {
+      const { default: RotinaEscolarStandalone } = await import('./pages/RotinaEscolarStandalone.jsx')
+      root.render(
+        <StrictMode>
+          <SidebarGlobal />
+          <RotinaEscolarStandalone />
         </StrictMode>,
       )
       return
