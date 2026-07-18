@@ -45,6 +45,7 @@ async function iniciar() {
     const paginaRpg = window.location.pathname.startsWith('/rpg')
     const paginaRotina = window.location.pathname.startsWith('/rotina')
     const paginaTribos = window.location.pathname.startsWith('/tribos')
+    const paginaComunidade = window.location.pathname.startsWith('/comunidade')
     const { default: SidebarGlobal } = await import(
       './components/layout/SidebarGlobal.jsx'
     )
@@ -100,6 +101,17 @@ async function iniciar() {
         <StrictMode>
           <SidebarGlobal />
           <TribosCompletasStandalone />
+        </StrictMode>,
+      )
+      return
+    }
+
+    if (paginaComunidade) {
+      const { default: ComunidadeSocialStandalone } = await import('./pages/ComunidadeSocialStandalone.jsx')
+      root.render(
+        <StrictMode>
+          <SidebarGlobal />
+          <ComunidadeSocialStandalone />
         </StrictMode>,
       )
       return
