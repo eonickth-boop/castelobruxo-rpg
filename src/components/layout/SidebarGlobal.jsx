@@ -7,6 +7,7 @@ const gruposBase = [
     { id: 'inicio', icone: '🏠', rotulo: 'Início' },
     { id: 'perfil', icone: '👤', rotulo: 'Meu Perfil' },
     { id: 'perfil-publico', icone: '🌐', rotulo: 'Perfil Público' },
+    { id: 'comunidade-social', icone: '🤝', rotulo: 'Comunidade', href: '/comunidade' },
     { id: 'diario-personagem', icone: '📖', rotulo: 'Diário' },
     { id: 'pets', icone: '🐾', rotulo: 'Companheiros' },
   ]},
@@ -56,6 +57,7 @@ export default function SidebarGlobal() {
     if (window.location.pathname.startsWith('/rpg')) return 'rpg-textual'
     if (window.location.pathname.startsWith('/rotina')) return 'rotina-escolar'
     if (window.location.pathname.startsWith('/tribos')) return 'tribos-completas'
+    if (window.location.pathname.startsWith('/comunidade')) return 'comunidade-social'
     return 'inicio'
   })
 
