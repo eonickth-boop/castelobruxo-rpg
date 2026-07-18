@@ -68,9 +68,7 @@ export default function ComunidadeSocialStandalone() {
   }, [pessoas, busca, tribo, ano, bloqueadosIds])
 
   function estadoCom(pessoaId) {
-    const amizade = amizades.find((a) => (a.solicitante_id === perfil?.id && a.destinatario_id === pessoaId) || (a.solicitante_id === pessoaId && a.destinatario_id === perfil?.id))
-    if (!amizade) return null
-    return amizade
+    return amizades.find((a) => (a.solicitante_id === perfil?.id && a.destinatario_id === pessoaId) || (a.solicitante_id === pessoaId && a.destinatario_id === perfil?.id)) || null
   }
 
   async function acaoRpc(nome, parametros, aviso) {
@@ -88,6 +86,13 @@ export default function ComunidadeSocialStandalone() {
     await carregar()
   }
 
+  async function iniciarChat(pessoa) {
+    setMensagem('')
+    const { data, error } = await supabase.rpc('social_obter_ou_criar_conversa', { p_outro: pessoa.id })
+    if (error) { setMensagem(error.message || 'Não foi possível iniciar a conversa.'); return }
+    window.location.href = `/chat?conversa=${encodeURIComponent(data)}`
+  }
+
   function CartaoPessoa({ pessoa }) {
     const estado = estadoCom(pessoa.id)
     const pedidoRecebido = estado?.status === 'pendente' && estado.destinatario_id === perfil.id
@@ -98,7 +103,7 @@ export default function ComunidadeSocialStandalone() {
         {!estado && <button onClick={() => acaoRpc('social_enviar_pedido', { p_destinatario: pessoa.id }, 'Pedido de amizade enviado.')}>Adicionar</button>}
         {estado?.status === 'pendente' && !pedidoRecebido && <button disabled>Pedido enviado</button>}
         {pedidoRecebido && <><button onClick={() => acaoRpc('social_responder_pedido', { p_pedido: estado.id, p_aceitar: true }, 'Amizade aceita.')}>Aceitar</button><button className="secundario" onClick={() => acaoRpc('social_responder_pedido', { p_pedido: estado.id, p_aceitar: false }, 'Pedido recusado.')}>Recusar</button></>}
-        {estado?.status === 'aceita' && <button className="secundario" onClick={() => acaoRpc('social_desfazer_amizade', { p_pessoa: pessoa.id }, 'Amizade desfeita.')}>Desfazer amizade</button>}
+        {estado?.status === 'aceita' && <><button onClick={() => iniciarChat(pessoa)}>Conversar</button><button className="secundario" onClick={() => acaoRpc('social_desfazer_amizade', { p_pessoa: pessoa.id }, 'Amizade desfeita.')}>Desfazer amizade</button></>}
         <button className="perigo" onClick={() => acaoRpc('social_bloquear', { p_pessoa: pessoa.id }, 'Personagem bloqueado.')}>Bloquear</button>
       </div>
     </article>
@@ -108,20 +113,21 @@ export default function ComunidadeSocialStandalone() {
   if (!sessao) return <main className="social-shell social-central"><h1>Comunidade</h1><p>Entre na sua conta para acessar.</p><button onClick={() => { window.location.href = '/' }}>Ir para o portal</button></main>
 
   return <main className="social-shell">
-    <header className="social-hero"><button onClick={() => { window.location.href = '/' }}>← Portal</button><div><small>Checkpoint 14.1</small><h1>Comunidade de Castelobruxo</h1><p>Encontre personagens, crie vínculos e organize suas relações.</p></div><aside><span>Amigos</span><strong>{amigos.length}</strong></aside></header>
+    <header className="social-hero"><button onClick={() => { window.location.href = '/' }}>← Portal</button><div><small>Checkpoint 14.2</small><h1>Comunidade de Castelobruxo</h1><p>Encontre personagens, crie vínculos e converse em tempo real.</p></div><aside><span>Amigos</span><strong>{amigos.length}</strong></aside></header>
 
     <nav className="social-abas">
       <button className={aba === 'descobrir' ? 'ativo' : ''} onClick={() => setAba('descobrir')}>Descobrir</button>
       <button className={aba === 'amigos' ? 'ativo' : ''} onClick={() => setAba('amigos')}>Amigos <span>{amigos.length}</span></button>
       <button className={aba === 'pedidos' ? 'ativo' : ''} onClick={() => setAba('pedidos')}>Pedidos <span>{pedidosRecebidos.length}</span></button>
       <button className={aba === 'bloqueados' ? 'ativo' : ''} onClick={() => setAba('bloqueados')}>Bloqueados</button>
+      <button onClick={() => { window.location.href = '/chat' }}>💬 Chat privado</button>
     </nav>
 
     {mensagem && <p className="social-mensagem">{mensagem}</p>}
 
     {aba === 'descobrir' && <section className="social-conteudo"><div className="social-filtros"><input placeholder="Buscar por nome ou usuário" value={busca} onChange={(e) => setBusca(e.target.value)} /><select value={tribo} onChange={(e) => setTribo(e.target.value)}><option value="todas">Todas as tribos</option>{tribos.map((t) => <option key={t}>{t}</option>)}</select><select value={ano} onChange={(e) => setAno(e.target.value)}><option value="todos">Todos os anos</option>{anos.map((a) => <option key={a} value={a}>{a}º ano</option>)}</select></div><div className="social-grade">{resultados.map((p) => <CartaoPessoa key={p.id} pessoa={p} />)}</div>{resultados.length === 0 && <p className="social-vazio">Nenhum personagem encontrado.</p>}</section>}
 
-    {aba === 'amigos' && <section className="social-conteudo"><div className="social-grade">{amigos.map(({ amizade, pessoa, classificacao }) => <article className="social-card" key={amizade.id}><div className="social-avatar">{pessoa.avatar_url ? <img src={pessoa.avatar_url} alt="" /> : <span>{nomePessoa(pessoa)[0]}</span>}</div><div className="social-identidade"><h3>{nomePessoa(pessoa)}</h3><p>@{pessoa.usuario}</p><small>{pessoa.tribo || 'Sem tribo'} · nível {pessoa.nivel || 1}</small><select value={classificacao || ''} onChange={(e) => classificar(amizade, e.target.value)}><option value="">Sem classificação</option>{TIPOS.map((t) => <option key={t}>{t}</option>)}</select></div><div className="social-card-acoes"><button onClick={() => { window.location.href = `/?pagina=correio-magico&destinatario=${encodeURIComponent(pessoa.usuario)}` }}>Enviar carta</button><button className="secundario" onClick={() => acaoRpc('social_desfazer_amizade', { p_pessoa: pessoa.id }, 'Amizade desfeita.')}>Desfazer amizade</button></div></article>)}</div>{amigos.length === 0 && <p className="social-vazio">Sua lista de amigos ainda está vazia.</p>}</section>}
+    {aba === 'amigos' && <section className="social-conteudo"><div className="social-grade">{amigos.map(({ amizade, pessoa, classificacao }) => <article className="social-card" key={amizade.id}><div className="social-avatar">{pessoa.avatar_url ? <img src={pessoa.avatar_url} alt="" /> : <span>{nomePessoa(pessoa)[0]}</span>}</div><div className="social-identidade"><h3>{nomePessoa(pessoa)}</h3><p>@{pessoa.usuario}</p><small>{pessoa.tribo || 'Sem tribo'} · nível {pessoa.nivel || 1}</small><select value={classificacao || ''} onChange={(e) => classificar(amizade, e.target.value)}><option value="">Sem classificação</option>{TIPOS.map((t) => <option key={t}>{t}</option>)}</select></div><div className="social-card-acoes"><button onClick={() => iniciarChat(pessoa)}>Conversar</button><button onClick={() => { window.location.href = `/?pagina=correio-magico&destinatario=${encodeURIComponent(pessoa.usuario)}` }}>Enviar carta</button><button className="secundario" onClick={() => acaoRpc('social_desfazer_amizade', { p_pessoa: pessoa.id }, 'Amizade desfeita.')}>Desfazer amizade</button></div></article>)}</div>{amigos.length === 0 && <p className="social-vazio">Sua lista de amigos ainda está vazia.</p>}</section>}
 
     {aba === 'pedidos' && <section className="social-conteudo"><h2>Recebidos</h2><div className="social-grade">{pedidosRecebidos.map((p) => mapaPessoas.get(p.solicitante_id)).filter(Boolean).map((p) => <CartaoPessoa key={p.id} pessoa={p} />)}</div><h2>Enviados</h2><div className="social-grade">{pedidosEnviados.map((p) => mapaPessoas.get(p.destinatario_id)).filter(Boolean).map((p) => <CartaoPessoa key={p.id} pessoa={p} />)}</div></section>}
 
