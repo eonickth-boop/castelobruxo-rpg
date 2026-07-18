@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../services/supabase'
-import '../../styles/perfil-social-integrado.css'
+import '../../styles/social-integracoes.css'
 
 function nome(p) { return p?.nome_personagem || p?.usuario || 'Personagem' }
 function formatar(v) { return v ? new Date(v).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '' }
