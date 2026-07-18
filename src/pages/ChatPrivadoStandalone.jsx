@@ -57,10 +57,36 @@ export default function ChatPrivadoStandalone() {
   }
 
   async function carregarMensagens(conversaId) {
-    const { data, error } = await supabase.from('social_mensagens').select(`*,autor:perfis!social_mensagens_autor_id_fkey(id,usuario,nome_personagem,avatar_url),resposta:social_mensagens!social_mensagens_respondendo_a_fkey(id,conteudo,autor_id)`).eq('conversa_id',conversaId).order('criado_em')
-    if (error) { setAviso('Não foi possível carregar as mensagens.'); return }
-    setMensagens(data || [])
-    if (perfil?.id) await supabase.from('social_conversa_estado').upsert({ conversa_id: conversaId, usuario_id: perfil.id, lida_ate: new Date().toISOString() }, { onConflict:'conversa_id,usuario_id' })
+    setAviso('')
+    const { data, error } = await supabase
+      .from('social_mensagens')
+      .select('id,conversa_id,autor_id,conteudo,respondendo_a,editada,apagada,criado_em,atualizado_em')
+      .eq('conversa_id', conversaId)
+      .order('criado_em')
+
+    if (error) {
+      console.error('Erro ao carregar mensagens do chat:', error)
+      setAviso(error.message || 'Não foi possível carregar as mensagens.')
+      return
+    }
+
+    const lista = data || []
+    const mapa = new Map(lista.map((mensagem) => [mensagem.id, mensagem]))
+    setMensagens(lista.map((mensagem) => ({
+      ...mensagem,
+      resposta: mensagem.respondendo_a ? mapa.get(mensagem.respondendo_a) || null : null,
+    })))
+
+    if (perfil?.id) {
+      const { error: erroLeitura } = await supabase
+        .from('social_conversa_estado')
+        .upsert(
+          { conversa_id: conversaId, usuario_id: perfil.id, lida_ate: new Date().toISOString() },
+          { onConflict:'conversa_id,usuario_id' },
+        )
+      if (erroLeitura) console.error('Erro ao marcar conversa como lida:', erroLeitura)
+    }
+
     carregarConversas()
   }
 
@@ -92,6 +118,7 @@ export default function ChatPrivadoStandalone() {
   async function silenciar() {
     const novo = !selecionada.estado?.silenciada
     await supabase.from('social_conversa_estado').upsert({ conversa_id:selecionada.id, usuario_id:perfil.id, silenciada:novo },{onConflict:'conversa_id,usuario_id'})
+    setSelecionada((atual) => ({ ...atual, estado: { ...(atual.estado || {}), silenciada: novo } }))
     setAviso(novo ? 'Conversa silenciada.' : 'Notificações reativadas.')
     await carregarConversas()
   }
@@ -111,7 +138,7 @@ export default function ChatPrivadoStandalone() {
       <section className="chat-conversa">
         {!selecionada?<div className="chat-vazio"><h2>Escolha uma conversa</h2><p>Abra uma amizade pela Central Social para começar.</p></div>:<>
           <header className="chat-cabecalho"><div><strong>{selecionada.outro?.nome_personagem||selecionada.outro?.usuario}</strong><small>@{selecionada.outro?.usuario} · {selecionada.outro?.tribo||'Sem tribo'}</small></div><button onClick={silenciar}>{selecionada.estado?.silenciada?'Reativar':'Silenciar'}</button></header>
-          <div className="chat-mensagens">{mensagens.map(m=><article key={m.id} className={m.autor_id===perfil?.id?'minha':''}>{m.respondendo_a&&m.resposta&&<blockquote>{m.resposta.conteudo}</blockquote>}<div><p>{m.conteudo}</p><footer><time>{hora(m.criado_em)}{m.editada?' · editada':''}</time>{m.autor_id===perfil?.id&&!m.apagada&&<span><button onClick={()=>{setEditando(m);setTexto(m.conteudo)}}>Editar</button><button onClick={()=>apagar(m)}>Apagar</button></span>}{m.autor_id!==perfil?.id&&!m.apagada&&<button onClick={()=>setResposta(m)}>Responder</button>}</footer></div></article>)}<div ref={fimRef}/></div>
+          <div className="chat-mensagens">{mensagens.length === 0 && <p className="chat-sem-mensagens">Nenhuma mensagem ainda. Escreva a primeira.</p>}{mensagens.map(m=><article key={m.id} className={m.autor_id===perfil?.id?'minha':''}>{m.respondendo_a&&m.resposta&&<blockquote>{m.resposta.apagada?'Mensagem apagada':m.resposta.conteudo}</blockquote>}<div><p>{m.conteudo}</p><footer><time>{hora(m.criado_em)}{m.editada?' · editada':''}</time>{m.autor_id===perfil?.id&&!m.apagada&&<span><button onClick={()=>{setEditando(m);setResposta(null);setTexto(m.conteudo)}}>Editar</button><button onClick={()=>apagar(m)}>Apagar</button></span>}{m.autor_id!==perfil?.id&&!m.apagada&&<button onClick={()=>{setResposta(m);setEditando(null);setTexto('')}}>Responder</button>}</footer></div></article>)}<div ref={fimRef}/></div>
           {(resposta||editando)&&<div className="chat-contexto"><span>{editando?'Editando mensagem':`Respondendo: ${resposta?.conteudo}`}</span><button onClick={()=>{setResposta(null);setEditando(null);setTexto('')}}>×</button></div>}
           <form className="chat-form" onSubmit={enviar}><textarea rows={2} maxLength={3000} value={texto} onChange={e=>setTexto(e.target.value)} placeholder="Escreva uma mensagem..."/><button>{editando?'Salvar':'Enviar'}</button></form>
         </>}
