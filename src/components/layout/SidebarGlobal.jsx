@@ -8,6 +8,7 @@ const gruposBase = [
     { id: 'perfil', icone: '👤', rotulo: 'Meu Perfil' },
     { id: 'perfil-publico', icone: '🌐', rotulo: 'Perfil Público' },
     { id: 'comunidade-social', icone: '🤝', rotulo: 'Comunidade', href: '/comunidade' },
+    { id: 'chat-privado', icone: '💬', rotulo: 'Chat Privado', href: '/chat' },
     { id: 'diario-personagem', icone: '📖', rotulo: 'Diário' },
     { id: 'pets', icone: '🐾', rotulo: 'Companheiros' },
   ]},
@@ -43,10 +44,7 @@ function navegar(item) {
     window.location.href = item.href
     return
   }
-
-  window.dispatchEvent(new CustomEvent('castelobruxo:navegar', {
-    detail: { pagina: item.id },
-  }))
+  window.dispatchEvent(new CustomEvent('castelobruxo:navegar', { detail: { pagina: item.id } }))
 }
 
 export default function SidebarGlobal() {
@@ -58,60 +56,29 @@ export default function SidebarGlobal() {
     if (window.location.pathname.startsWith('/rotina')) return 'rotina-escolar'
     if (window.location.pathname.startsWith('/tribos')) return 'tribos-completas'
     if (window.location.pathname.startsWith('/comunidade')) return 'comunidade-social'
+    if (window.location.pathname.startsWith('/chat')) return 'chat-privado'
     return 'inicio'
   })
 
   useEffect(() => {
     let ativo = true
-
     async function carregarPerfilDaSessao(novaSessao) {
-      if (!novaSessao?.user) {
-        setPerfil(null)
-        return
-      }
-
-      const { data, error } = await supabase
-        .from('perfis')
-        .select('id, usuario, nome_personagem, avatar_url, cargo, tribo, nivel')
-        .eq('id', novaSessao.user.id)
-        .maybeSingle()
-
-      if (error) {
-        console.error('Erro ao carregar perfil da sidebar:', error)
-        return
-      }
-
+      if (!novaSessao?.user) { setPerfil(null); return }
+      const { data, error } = await supabase.from('perfis').select('id, usuario, nome_personagem, avatar_url, cargo, tribo, nivel').eq('id', novaSessao.user.id).maybeSingle()
+      if (error) { console.error('Erro ao carregar perfil da sidebar:', error); return }
       if (ativo) setPerfil(data ?? null)
     }
-
     async function iniciar() {
       const { data } = await supabase.auth.getSession()
       if (!ativo) return
       setSessao(data.session)
       await carregarPerfilDaSessao(data.session)
     }
-
     iniciar()
-
-    const { data } = supabase.auth.onAuthStateChange(async (_evento, novaSessao) => {
-      setSessao(novaSessao)
-      await carregarPerfilDaSessao(novaSessao)
-    })
-
-    const ouvirPagina = (evento) => {
-      if (evento.detail?.pagina) {
-        setPaginaAtual(evento.detail.pagina)
-        setAberta(false)
-      }
-    }
-
+    const { data } = supabase.auth.onAuthStateChange(async (_evento, novaSessao) => { setSessao(novaSessao); await carregarPerfilDaSessao(novaSessao) })
+    const ouvirPagina = (evento) => { if (evento.detail?.pagina) { setPaginaAtual(evento.detail.pagina); setAberta(false) } }
     window.addEventListener('castelobruxo:pagina-alterada', ouvirPagina)
-
-    return () => {
-      ativo = false
-      data.subscription.unsubscribe()
-      window.removeEventListener('castelobruxo:pagina-alterada', ouvirPagina)
-    }
+    return () => { ativo = false; data.subscription.unsubscribe(); window.removeEventListener('castelobruxo:pagina-alterada', ouvirPagina) }
   }, [])
 
   useEffect(() => {
@@ -122,62 +89,23 @@ export default function SidebarGlobal() {
 
   const grupos = useMemo(() => {
     if (!perfil || !['professor', 'administrador'].includes(perfil.cargo)) return gruposBase
-
-    return [...gruposBase, {
-      titulo: 'Gestão',
-      itens: [
-        { id: 'painel-professor', icone: '👨‍🏫', rotulo: 'Painel do Professor' },
-        { id: 'painel-administrativo', icone: '🛡️', rotulo: 'Painel Administrativo' },
-        { id: 'cms-conteudo', icone: '🧰', rotulo: 'CMS de Conteúdo' },
-      ],
-    }]
+    return [...gruposBase, { titulo: 'Gestão', itens: [
+      { id: 'painel-professor', icone: '👨‍🏫', rotulo: 'Painel do Professor' },
+      { id: 'painel-administrativo', icone: '🛡️', rotulo: 'Painel Administrativo' },
+      { id: 'cms-conteudo', icone: '🧰', rotulo: 'CMS de Conteúdo' },
+    ] }]
   }, [perfil])
 
   if (!sessao || !perfil) return null
-
   const nome = perfil.nome_personagem || perfil.usuario
 
-  return (
-    <>
-      <button type="button" className="cb-sidebar-toggle" onClick={() => setAberta((valor) => !valor)} aria-label="Abrir menu">☰</button>
-      {aberta && <button type="button" className="cb-sidebar-overlay" onClick={() => setAberta(false)} aria-label="Fechar menu" />}
-
-      <aside className={`cb-sidebar-global ${aberta ? 'cb-sidebar-aberta' : ''}`}>
-        <header className="cb-sidebar-perfil">
-          <div className="cb-sidebar-avatar">
-            {perfil.avatar_url ? <img src={perfil.avatar_url} alt={nome} /> : <span>👤</span>}
-          </div>
-          <div>
-            <small>Estudante</small>
-            <strong>{nome}</strong>
-            <span>{perfil.tribo || 'Sem tribo'} · Nível {perfil.nivel || 1}</span>
-          </div>
-        </header>
-
-        <nav className="cb-sidebar-nav">
-          {grupos.map((grupo) => (
-            <section key={grupo.titulo}>
-              <h3>{grupo.titulo}</h3>
-              {grupo.itens.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={paginaAtual === item.id ? 'cb-sidebar-item cb-sidebar-item-ativo' : 'cb-sidebar-item'}
-                  onClick={() => navegar(item)}
-                >
-                  <span>{item.icone}</span>
-                  <strong>{item.rotulo}</strong>
-                </button>
-              ))}
-            </section>
-          ))}
-        </nav>
-
-        <footer className="cb-sidebar-footer">
-          <span>Castelobruxo</span>
-          <small>Conhecer · Respeitar · Proteger</small>
-        </footer>
-      </aside>
-    </>
-  )
+  return <>
+    <button type="button" className="cb-sidebar-toggle" onClick={() => setAberta((valor) => !valor)} aria-label="Abrir menu">☰</button>
+    {aberta && <button type="button" className="cb-sidebar-overlay" onClick={() => setAberta(false)} aria-label="Fechar menu" />}
+    <aside className={`cb-sidebar-global ${aberta ? 'cb-sidebar-aberta' : ''}`}>
+      <header className="cb-sidebar-perfil"><div className="cb-sidebar-avatar">{perfil.avatar_url ? <img src={perfil.avatar_url} alt={nome} /> : <span>👤</span>}</div><div><small>Estudante</small><strong>{nome}</strong><span>{perfil.tribo || 'Sem tribo'} · Nível {perfil.nivel || 1}</span></div></header>
+      <nav className="cb-sidebar-nav">{grupos.map((grupo) => <section key={grupo.titulo}><h3>{grupo.titulo}</h3>{grupo.itens.map((item) => <button key={item.id} type="button" className={paginaAtual === item.id ? 'cb-sidebar-item cb-sidebar-item-ativo' : 'cb-sidebar-item'} onClick={() => navegar(item)}><span>{item.icone}</span><strong>{item.rotulo}</strong></button>)}</section>)}</nav>
+      <footer className="cb-sidebar-footer"><span>Castelobruxo</span><small>Conhecer · Respeitar · Proteger</small></footer>
+    </aside>
+  </>
 }
