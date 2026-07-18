@@ -11,6 +11,7 @@ const gruposBase = [
     { id: 'pets', icone: '🐾', rotulo: 'Companheiros' },
   ]},
   { titulo: 'Escola', itens: [
+    { id: 'tribos-completas', icone: '🛡️', rotulo: 'Tribos', href: '/tribos' },
     { id: 'rotina-escolar', icone: '🗓️', rotulo: 'Rotina Escolar', href: '/rotina' },
     { id: 'aulas', icone: '🎓', rotulo: 'Sistema Acadêmico' },
     { id: 'biblioteca', icone: '📚', rotulo: 'Biblioteca' },
@@ -54,6 +55,7 @@ export default function SidebarGlobal() {
   const [paginaAtual, setPaginaAtual] = useState(() => {
     if (window.location.pathname.startsWith('/rpg')) return 'rpg-textual'
     if (window.location.pathname.startsWith('/rotina')) return 'rotina-escolar'
+    if (window.location.pathname.startsWith('/tribos')) return 'tribos-completas'
     return 'inicio'
   })
 
