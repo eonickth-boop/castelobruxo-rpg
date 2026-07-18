@@ -98,6 +98,16 @@ async function iniciar() {
         <App />
       </StrictMode>,
     )
+
+    const destino = new URLSearchParams(window.location.search).get('pagina')
+    if (destino) {
+      window.setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('castelobruxo:navegar', {
+          detail: { pagina: destino },
+        }))
+        window.history.replaceState({}, '', '/')
+      }, 250)
+    }
   } catch (error) {
     mostrarErro(error)
   }
