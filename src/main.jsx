@@ -44,7 +44,6 @@ async function iniciar() {
   try {
     const paginaRpg = window.location.pathname.startsWith('/rpg')
     const paginaRotina = window.location.pathname.startsWith('/rotina')
-    const paginaDormitorio = window.location.pathname.startsWith('/dormitorio')
     const { default: SidebarGlobal } = await import(
       './components/layout/SidebarGlobal.jsx'
     )
@@ -94,14 +93,8 @@ async function iniciar() {
       return
     }
 
-    if (paginaDormitorio) {
-      const { default: DormitorioPessoalStandalone } = await import('./pages/DormitorioPessoalStandalone.jsx')
-      root.render(
-        <StrictMode>
-          <SidebarGlobal />
-          <DormitorioPessoalStandalone />
-        </StrictMode>,
-      )
+    if (window.location.pathname.startsWith('/dormitorio')) {
+      window.location.replace('/')
       return
     }
 
