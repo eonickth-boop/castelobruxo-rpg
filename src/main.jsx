@@ -45,21 +45,23 @@ function mostrarErro(error) {
 async function iniciar() {
   try {
     const paginaRpg = window.location.pathname.startsWith('/rpg')
+    const { default: SidebarGlobal } = await import(
+      './components/layout/SidebarGlobal.jsx'
+    )
 
     if (paginaRpg) {
       const { default: RpgCenas } = await import('./pages/RpgCenas.jsx')
+
       root.render(
         <StrictMode>
+          <SidebarGlobal />
           <RpgCenas />
         </StrictMode>,
       )
       return
     }
 
-    const [{ default: App }, { default: SidebarGlobal }] = await Promise.all([
-      import('./App.jsx'),
-      import('./components/layout/SidebarGlobal.jsx'),
-    ])
+    const { default: App } = await import('./App.jsx')
 
     root.render(
       <StrictMode>
