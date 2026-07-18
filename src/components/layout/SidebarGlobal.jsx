@@ -5,7 +5,6 @@ import '../../styles/layout/sidebarGlobal.css'
 const gruposBase = [
   { titulo: 'Principal', itens: [
     { id: 'inicio', icone: '🏠', rotulo: 'Início' },
-    { id: 'dormitorio-pessoal', icone: '🛏️', rotulo: 'Dormitório', href: '/dormitorio' },
     { id: 'perfil', icone: '👤', rotulo: 'Meu Perfil' },
     { id: 'perfil-publico', icone: '🌐', rotulo: 'Perfil Público' },
     { id: 'diario-personagem', icone: '📖', rotulo: 'Diário' },
@@ -55,7 +54,6 @@ export default function SidebarGlobal() {
   const [paginaAtual, setPaginaAtual] = useState(() => {
     if (window.location.pathname.startsWith('/rpg')) return 'rpg-textual'
     if (window.location.pathname.startsWith('/rotina')) return 'rotina-escolar'
-    if (window.location.pathname.startsWith('/dormitorio')) return 'dormitorio-pessoal'
     return 'inicio'
   })
 
