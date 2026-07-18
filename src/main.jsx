@@ -57,6 +57,7 @@ async function iniciar() {
         { default: PainelRecompensasGlobal },
         { default: PainelNpcsGlobal },
         { default: PainelCampanhasGlobal },
+        { default: CentralNarradorGlobal },
       ] = await Promise.all([
         import('./pages/RpgCenas.jsx'),
         import('./components/rpg/PainelTestesGlobal.jsx'),
@@ -64,6 +65,7 @@ async function iniciar() {
         import('./components/rpg/PainelRecompensasGlobal.jsx'),
         import('./components/rpg/PainelNpcsGlobal.jsx'),
         import('./components/rpg/PainelCampanhasGlobal.jsx'),
+        import('./components/rpg/CentralNarradorGlobal.jsx'),
       ])
 
       root.render(
@@ -75,6 +77,7 @@ async function iniciar() {
           <PainelRecompensasGlobal />
           <PainelNpcsGlobal />
           <PainelCampanhasGlobal />
+          <CentralNarradorGlobal />
         </StrictMode>,
       )
       return
