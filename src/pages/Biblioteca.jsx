@@ -15,6 +15,8 @@ const capas = {
   Literatura: ['literatura', '❦'],
   Astronomia: ['astronomia', '☾'],
   Cultura: ['cultura', '♨'],
+  Criaturas: ['criaturas', '♞'],
+  Castelobruxo: ['castelobruxo', '✺'],
 }
 const dadosCapa = categoria => capas[categoria] || ['geral', '❦']
 
