@@ -6,6 +6,7 @@ const estilosCapa = {
   Enciclopédias: ['enciclopedias', '✦'], Herbologia: ['herbologia', '❧'], História: ['historia', '☀'],
   Feitiços: ['feiticos', '✧'], Poções: ['pocoes', '⚗'], Minerais: ['minerais', '◆'],
   Exploração: ['exploracao', '⌖'], Literatura: ['literatura', '❦'], Astronomia: ['astronomia', '☾'], Cultura: ['cultura', '♨'],
+  Criaturas: ['criaturas', '♞'], Castelobruxo: ['castelobruxo', '✺'],
 }
 
 const Pagina = forwardRef(function Pagina({ titulo, conteudo, numero, imagemUrl, capa = false, categoria, autor }, ref) {
