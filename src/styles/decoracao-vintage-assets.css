@@ -22,4 +22,8 @@ input::placeholder,textarea::placeholder{color:#817664}
 .biblioteca-header::after,.mapa-hero::after{content:"";position:absolute;right:14px;bottom:10px;width:110px;height:110px;background:url('/assets/decoracao-vintage/botanica/gravura-2.png') center/contain no-repeat;opacity:.18;pointer-events:none}
 .livro-card:nth-child(3n+1)::before{content:"";position:absolute;right:8px;top:8px;width:38px;height:38px;background:url('/assets/decoracao-vintage/selos/selo-2.png') center/contain no-repeat;opacity:.45}
 .livro-card{position:relative}
+.mapa-oficial-interna .mapa-ilustracao{background-image:linear-gradient(rgba(20,16,10,.08),rgba(20,16,10,.08)),url('/assets/decoracao-vintage/mapas/mapa-interno.png')!important;background-size:cover!important;background-position:center!important}
+.mapa-oficial-externa .mapa-ilustracao{background-image:linear-gradient(rgba(20,16,10,.08),rgba(20,16,10,.08)),url('/assets/decoracao-vintage/mapas/mapa-externo.png')!important;background-size:cover!important;background-position:center!important}
+.mapa-oficial .mapa-ilustracao::before{border-color:rgba(232,213,164,.38)!important}.mapa-oficial .mapa-ilustracao::after{opacity:.12}
+.mapa-ilustracao-titulo{background-image:linear-gradient(rgba(239,231,211,.9),rgba(219,206,176,.9)),var(--cb-paper)!important}
 @media(max-width:720px){body::after{width:150px;height:150px;opacity:.09}.biblioteca-header::after,.mapa-hero::after{width:70px;height:70px}}
