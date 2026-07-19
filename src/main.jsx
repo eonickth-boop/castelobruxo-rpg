@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import './styles/mobile-final.css'
+import './services/supabasePerfilPatch.js'
 import { iniciarPontePerfilSocial } from './socialProfileBridge.jsx'
 import { ativarFallbackDePerfilMobile } from './services/perfilMobileFallback.js'
 
