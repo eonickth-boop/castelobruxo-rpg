@@ -4,6 +4,19 @@ import Livro from './Livro'
 import '../styles/biblioteca.css'
 
 const LIMITE_CARTAO = 10
+const capas = {
+  Enciclopédias: ['enciclopedias', '✦'],
+  Herbologia: ['herbologia', '❧'],
+  História: ['historia', '☀'],
+  Feitiços: ['feiticos', '✧'],
+  Poções: ['pocoes', '⚗'],
+  Minerais: ['minerais', '◆'],
+  Exploração: ['exploracao', '⌖'],
+  Literatura: ['literatura', '❦'],
+  Astronomia: ['astronomia', '☾'],
+  Cultura: ['cultura', '♨'],
+}
+const dadosCapa = categoria => capas[categoria] || ['geral', '❦']
 
 export default function Biblioteca({ onVoltar }) {
   const [livros, setLivros] = useState([])
@@ -36,12 +49,10 @@ export default function Biblioteca({ onVoltar }) {
   async function carregarEmprestimos() {
     const { data: auth } = await supabase.auth.getUser()
     if (!auth?.user) { setEmprestimos([]); setNomeEstudante(''); return }
-
     const [{ data: perfil }, { data, error }] = await Promise.all([
       supabase.from('perfis').select('nome_personagem, usuario').eq('id', auth.user.id).maybeSingle(),
       supabase.from('biblioteca_emprestimos').select('id, livro_id, emprestado_em, devolucao_prevista, livros(titulo, autor)').is('devolvido_em', null).order('emprestado_em', { ascending: true }),
     ])
-
     setNomeEstudante(perfil?.nome_personagem || perfil?.usuario || 'Estudante')
     if (error) { console.error(error); setMensagem('Não foi possível carregar seu cartão da biblioteca.'); return }
     setEmprestimos(data ?? [])
@@ -85,29 +96,33 @@ export default function Biblioteca({ onVoltar }) {
 
   return <main className="biblioteca">
     <button type="button" className="biblioteca-voltar" onClick={onVoltar}>← Voltar</button>
-    <header className="biblioteca-header"><div className="biblioteca-emblema">❦</div><p className="biblioteca-selo">Arquivo Central de Castelobruxo</p><h1>Biblioteca Ancestral</h1><p>Leia no acervo ou registre um empréstimo no seu cartão pessoal.</p></header>
+    <header className="biblioteca-header"><div className="biblioteca-emblema">❦</div><p className="biblioteca-selo">Arquivo Central de Castelobruxo</p><h1>Biblioteca Ancestral</h1><p>Livros, enciclopédias, lendas e registros para leitura, pesquisa e investigação.</p></header>
 
     <section className="biblioteca-cartao-area">
       <div className="biblioteca-cartao" aria-label="Cartão da Biblioteca de Castelobruxo">
         <div className="biblioteca-cartao-cabecalho"><span>CASTELOBRUXO</span><strong>Cartão da Biblioteca</strong><small>Arquivo Central</small></div>
         <div className="biblioteca-cartao-titulos"><span>NOME DO ESTUDANTE</span><span>DEVOLUÇÃO</span></div>
-        <div className="biblioteca-cartao-linhas">
-          {Array.from({ length: LIMITE_CARTAO }, (_, indice) => {
-            const item = emprestimos[indice]
-            return <div className="biblioteca-cartao-linha" key={item?.id || indice}><span title={item ? nomeEstudante : ''}>{item ? nomeEstudante : ''}</span><time>{item ? new Date(`${item.devolucao_prevista}T12:00:00`).toLocaleDateString('pt-BR') : ''}</time></div>
-          })}
-        </div>
+        <div className="biblioteca-cartao-linhas">{Array.from({ length: LIMITE_CARTAO }, (_, indice) => {
+          const item = emprestimos[indice]
+          return <div className="biblioteca-cartao-linha" key={item?.id || indice}><span>{item ? nomeEstudante : ''}</span><time>{item ? new Date(`${item.devolucao_prevista}T12:00:00`).toLocaleDateString('pt-BR') : ''}</time></div>
+        })}</div>
         <div className="biblioteca-cartao-rodape">Este cartão pertence ao acervo escolar de Castelobruxo</div>
       </div>
-      <div className="biblioteca-cartao-info"><p>Seu registro de empréstimos</p><h2>Cartão da Biblioteca</h2><strong className="biblioteca-cartao-nome">{nomeEstudante || 'Estudante'}</strong><span>{emprestimos.length} de {LIMITE_CARTAO} espaços preenchidos</span><small>Ao devolver um livro, o nome e a data são apagados e a linha volta a ficar vazia.</small></div>
+      <div className="biblioteca-cartao-info"><p>Seu registro de empréstimos</p><h2>Cartão da Biblioteca</h2><strong className="biblioteca-cartao-nome">{nomeEstudante || 'Estudante'}</strong><span>{emprestimos.length} de {LIMITE_CARTAO} espaços preenchidos</span><small>Ao devolver um livro, o nome e a data são apagados.</small></div>
     </section>
 
-    <section className="biblioteca-ferramentas"><label className="biblioteca-pesquisa"><span>⌕</span><input type="search" placeholder="Pesquisar por título, autor ou categoria..." value={pesquisa} onChange={e => setPesquisa(e.target.value)} /></label><div className="biblioteca-contador"><strong>{livrosFiltrados.length}</strong><span>{livrosFiltrados.length === 1 ? 'obra encontrada' : 'obras encontradas'}</span></div></section>
+    <section className="biblioteca-ferramentas"><label className="biblioteca-pesquisa"><span>⌕</span><input type="search" placeholder="Pesquisar por título, autor ou categoria..." value={pesquisa} onChange={e => setPesquisa(e.target.value)} /></label><div className="biblioteca-contador"><strong>{livrosFiltrados.length}</strong><span>obras encontradas</span></div></section>
     <section className="categorias">{categorias.map(nome => <button key={nome} type="button" onClick={() => setCategoria(nome)} className={categoria === nome ? 'categoria-ativa' : undefined}>{nome}</button>)}</section>
     {mensagem && <p className="biblioteca-mensagem">{mensagem}</p>}
-    {carregando ? <section className="biblioteca-estado"><div className="biblioteca-carregando" /><p>Organizando as estantes...</p></section> : livrosFiltrados.length === 0 ? <section className="biblioteca-estado"><span>📕</span><h2>Nenhum livro encontrado</h2></section> : <section className="estante">{livrosFiltrados.map(livro => {
+
+    {carregando ? <section className="biblioteca-estado"><div className="biblioteca-carregando" /><p>Organizando as estantes...</p></section> : <section className="estante">{livrosFiltrados.map(livro => {
       const emprestimo = emprestimoPorLivro[livro.id]
-      return <article className="livro-card" key={livro.id}><div className="capa-container">{livro.capa_url ? <img src={livro.capa_url} alt={`Capa de ${livro.titulo}`} className="capa-livro" loading="lazy" /> : <div className="capa-sem-imagem"><span>❦</span><strong>{livro.titulo}</strong></div>}</div><div className="livro-card-conteudo"><span className="livro-categoria">{livro.categoria || 'Acervo Geral'}</span><h2>{livro.titulo}</h2><p className="livro-autor">por {livro.autor || 'Autor desconhecido'}</p><p className="livro-descricao">{livro.descricao || 'Obra preservada no acervo de Castelobruxo.'}</p></div><div className="livro-acoes"><button type="button" onClick={() => abrirLivro(livro)} disabled={livroAbrindoId !== null}>{livroAbrindoId === livro.id ? 'Abrindo...' : 'Ler agora'}</button>{emprestimo ? <button type="button" className="livro-devolver" onClick={() => devolver(emprestimo)} disabled={acaoId === livro.id}>{acaoId === livro.id ? 'Registrando...' : 'Devolver'}</button> : <button type="button" className="livro-emprestar" onClick={() => emprestar(livro)} disabled={acaoId === livro.id || emprestimos.length >= LIMITE_CARTAO}>{acaoId === livro.id ? 'Registrando...' : 'Emprestar por 14 dias'}</button>}</div></article>
+      const [classeCapa, simbolo] = dadosCapa(livro.categoria)
+      return <article className="livro-card" key={livro.id}>
+        <div className="capa-container">{livro.capa_url ? <img src={livro.capa_url} alt={`Capa de ${livro.titulo}`} className="capa-livro" /> : <div className={`capa-css capa-${classeCapa}`}><span className="capa-css-simbolo">{simbolo}</span><small>{livro.categoria}</small><strong>{livro.titulo}</strong><em>{livro.autor}</em></div>}</div>
+        <div className="livro-card-conteudo"><span className="livro-categoria">{livro.categoria || 'Acervo Geral'}</span><h2>{livro.titulo}</h2><p className="livro-autor">por {livro.autor}</p><p className="livro-descricao">{livro.descricao}</p></div>
+        <div className="livro-acoes"><button type="button" onClick={() => abrirLivro(livro)} disabled={livroAbrindoId !== null}>{livroAbrindoId === livro.id ? 'Abrindo...' : 'Ler agora'}</button>{emprestimo ? <button type="button" className="livro-devolver" onClick={() => devolver(emprestimo)} disabled={acaoId === livro.id}>Devolver</button> : <button type="button" className="livro-emprestar" onClick={() => emprestar(livro)} disabled={acaoId === livro.id || emprestimos.length >= LIMITE_CARTAO}>Emprestar por 14 dias</button>}</div>
+      </article>
     })}</section>}
   </main>
 }
