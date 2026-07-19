@@ -2,9 +2,15 @@ import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../services/supabase'
 import '../styles/mapa-interativo.css'
 
+const ABAS = [
+  { id: 'interna', nome: 'Áreas internas' },
+  { id: 'externa', nome: 'Áreas externas' },
+]
+
 export default function MapaInterativo({ perfil, onVoltar, onAbrirLocal }) {
   const [locais, setLocais] = useState([])
   const [selecionado, setSelecionado] = useState(null)
+  const [ambiente, setAmbiente] = useState('interna')
   const [cenasPorLocal, setCenasPorLocal] = useState({})
   const [carregando, setCarregando] = useState(true)
   const [mensagem, setMensagem] = useState('')
@@ -14,12 +20,10 @@ export default function MapaInterativo({ perfil, onVoltar, onAbrirLocal }) {
   async function carregarMapa() {
     setCarregando(true)
     setMensagem('')
-
     const [{ data: dadosLocais, error }, { data: cenas, error: erroCenas }] = await Promise.all([
       supabase.rpc('listar_locais_mapa_usuario'),
       supabase.from('rpg_cenas').select('id, local_codigo, status').eq('status', 'aberta'),
     ])
-
     if (error) {
       console.error('Erro ao carregar mapa:', error)
       setMensagem(error.message || 'Não foi possível carregar o mapa.')
@@ -27,28 +31,26 @@ export default function MapaInterativo({ perfil, onVoltar, onAbrirLocal }) {
       setCarregando(false)
       return
     }
-
     if (erroCenas) console.error('Erro ao carregar atividade do RPG:', erroCenas)
-
-    const contagem = (cenas || []).reduce((resultado, cena) => {
-      if (!cena.local_codigo) return resultado
-      resultado[cena.local_codigo] = (resultado[cena.local_codigo] || 0) + 1
-      return resultado
+    const contagem = (cenas || []).reduce((r, cena) => {
+      if (cena.local_codigo) r[cena.local_codigo] = (r[cena.local_codigo] || 0) + 1
+      return r
     }, {})
-
-    const lista = dadosLocais ?? []
+    const lista = (dadosLocais ?? []).filter(local => ['interna', 'externa', 'secreta'].includes(local.ambiente))
     setCenasPorLocal(contagem)
     setLocais(lista)
-    setSelecionado((atual) => atual ?? lista[0] ?? null)
+    setSelecionado(lista.find(local => local.ambiente === 'interna') ?? lista[0] ?? null)
     setCarregando(false)
   }
 
-  const grupos = useMemo(() => locais.reduce((resultado, local) => {
-    const categoria = local.categoria || 'Outros'
-    if (!resultado[categoria]) resultado[categoria] = []
-    resultado[categoria].push(local)
-    return resultado
-  }, {}), [locais])
+  const locaisVisiveis = useMemo(() => locais.filter(local => local.ambiente === ambiente).sort((a, b) => (a.ordem || 0) - (b.ordem || 0)), [locais, ambiente])
+  const secretos = useMemo(() => locais.filter(local => local.ambiente === 'secreta').sort((a, b) => (a.ordem || 0) - (b.ordem || 0)), [locais])
+
+  function trocarAmbiente(novo) {
+    setAmbiente(novo)
+    setMensagem('')
+    setSelecionado(locais.find(local => local.ambiente === novo) ?? null)
+  }
 
   function abrirLocal(local) {
     if (!local.desbloqueado) {
@@ -63,7 +65,6 @@ export default function MapaInterativo({ perfil, onVoltar, onAbrirLocal }) {
       setMensagem(local.motivo_bloqueio || 'Local bloqueado.')
       return
     }
-
     const parametros = new URLSearchParams({ local: local.codigo, nome: local.nome })
     if (criar) parametros.set('nova', '1')
     window.location.href = `/rpg?${parametros.toString()}`
@@ -72,75 +73,48 @@ export default function MapaInterativo({ perfil, onVoltar, onAbrirLocal }) {
   return (
     <main className="mapa-pagina">
       <button type="button" className="mapa-voltar" onClick={onVoltar}>← Voltar</button>
-
       <header className="mapa-hero">
-        <p>Território de Castelobruxo</p>
-        <h1>Mapa Interativo</h1>
-        <span>Rotas disponíveis para <strong>{perfil.nome_personagem || perfil.usuario}</strong></span>
+        <p>Mapa oficial de Castelobruxo</p>
+        <h1>Territórios da escola</h1>
+        <span>Somente os locais registrados no mapa oficial fazem parte de Castelobruxo.</span>
       </header>
+
+      <nav className="mapa-abas" aria-label="Divisão do mapa">
+        {ABAS.map(aba => <button key={aba.id} type="button" className={ambiente === aba.id ? 'ativo' : ''} onClick={() => trocarAmbiente(aba.id)}>{aba.nome}</button>)}
+      </nav>
 
       {mensagem && <p className="mapa-mensagem">{mensagem}</p>}
 
-      {carregando ? <p className="mapa-estado">Carregando mapa...</p> : (
+      {carregando ? <p className="mapa-estado">Abrindo o mapa oficial...</p> : <>
         <section className="mapa-layout">
-          <div className="mapa-tabuleiro">
-            <div className="mapa-rio" aria-hidden="true" />
-            <div className="mapa-caminho mapa-caminho-um" aria-hidden="true" />
-            <div className="mapa-caminho mapa-caminho-dois" aria-hidden="true" />
-
-            {locais.map((local) => {
-              const cenasAtivas = cenasPorLocal[local.codigo] || 0
-              return (
-                <button
-                  type="button"
-                  key={local.id}
-                  className={`mapa-marcador ${local.desbloqueado ? '' : 'bloqueado'} ${selecionado?.id === local.id ? 'selecionado' : ''}`}
-                  style={{ left: `${local.posicao_x}%`, top: `${local.posicao_y}%` }}
-                  onClick={() => { setSelecionado(local); setMensagem('') }}
-                >
-                  <span>{local.icone || '📍'}</span>
-                  <strong>{local.nome}</strong>
-                  {!local.desbloqueado && <small>🔒</small>}
-                  {local.desbloqueado && cenasAtivas > 0 && <small title={`${cenasAtivas} cenas abertas`}>🪶 {cenasAtivas}</small>}
-                </button>
-              )
-            })}
+          <div className={`mapa-oficial mapa-oficial-${ambiente}`}>
+            <img src="/assets/mapa/mapa-oficial-castelobruxo.png" alt={`Mapa oficial — ${ambiente === 'interna' ? 'áreas internas' : 'áreas externas'}`} />
           </div>
 
           <aside className="mapa-painel">
-            {selecionado ? (
-              <>
-                <div className="mapa-painel-topo">
-                  <span>{selecionado.icone || '📍'}</span>
-                  <div><small>{selecionado.categoria}</small><h2>{selecionado.nome}</h2></div>
-                </div>
-
-                <p>{selecionado.descricao}</p>
-
-                <div className="mapa-requisitos">
-                  <div><small>Nível mínimo</small><strong>{selecionado.nivel_minimo}</strong></div>
-                  <div><small>Ano mínimo</small><strong>{selecionado.ano_minimo}º ano</strong></div>
-                  {selecionado.tribo_requisito && <div><small>Tribo</small><strong>{selecionado.tribo_requisito}</strong></div>}
-                  <div><small>Cenas abertas</small><strong>{cenasPorLocal[selecionado.codigo] || 0}</strong></div>
-                </div>
-
-                <div className={`mapa-status ${selecionado.desbloqueado ? 'desbloqueado' : 'bloqueado'}`}>
-                  {selecionado.desbloqueado ? '✓ Local disponível' : `🔒 ${selecionado.motivo_bloqueio}`}
-                </div>
-
-                <button type="button" disabled={!selecionado.desbloqueado} onClick={() => abrirLocal(selecionado)}>Abrir página do local</button>
-                <button type="button" disabled={!selecionado.desbloqueado} onClick={() => abrirRpg(selecionado)}>🪶 Ver cenas neste local</button>
-                <button type="button" disabled={!selecionado.desbloqueado} onClick={() => abrirRpg(selecionado, true)}>Criar cena neste local</button>
-              </>
-            ) : <p>Selecione um local do mapa.</p>}
-
-            <div className="mapa-legenda">
-              <h3>Regiões</h3>
-              {Object.entries(grupos).map(([categoria, itens]) => <div key={categoria}><strong>{categoria}</strong><span>{itens.length} locais</span></div>)}
+            <p className="mapa-painel-rotulo">{ambiente === 'interna' ? 'Dentro da escola' : 'Além dos portões'}</p>
+            <div className="mapa-lista">
+              {locaisVisiveis.map((local, indice) => <button type="button" key={local.id} className={`${selecionado?.id === local.id ? 'selecionado' : ''} ${local.desbloqueado ? '' : 'bloqueado'}`} onClick={() => { setSelecionado(local); setMensagem('') }}>
+                <span>{indice + 1}</span><div><strong>{local.nome}</strong><small>{local.categoria}</small></div>{!local.desbloqueado && <em>🔒</em>}
+              </button>)}
             </div>
+
+            {selecionado && <article className="mapa-detalhe">
+              <div className="mapa-painel-topo"><span>{selecionado.icone || '📍'}</span><div><small>{selecionado.categoria}</small><h2>{selecionado.nome}</h2></div></div>
+              <p>{selecionado.descricao}</p>
+              <div className={`mapa-status ${selecionado.desbloqueado ? 'desbloqueado' : 'bloqueado'}`}>{selecionado.desbloqueado ? '✓ Local disponível' : `🔒 ${selecionado.motivo_bloqueio}`}</div>
+              <button type="button" disabled={!selecionado.desbloqueado} onClick={() => abrirLocal(selecionado)}>Abrir página do local</button>
+              <button type="button" disabled={!selecionado.desbloqueado} onClick={() => abrirRpg(selecionado)}>Ver cenas ({cenasPorLocal[selecionado.codigo] || 0})</button>
+              <button type="button" disabled={!selecionado.desbloqueado} onClick={() => abrirRpg(selecionado, true)}>Criar cena</button>
+            </article>}
           </aside>
         </section>
-      )}
+
+        <section className="mapa-secretos">
+          <header><p>Registros restritos</p><h2>Locais secretos</h2></header>
+          <div>{secretos.map(local => <article key={local.id}><span>{local.icone || '🔐'}</span><h3>{local.nome}</h3><p>{local.descricao}</p><button type="button" onClick={() => abrirRpg(local)} disabled={!local.desbloqueado}>{local.desbloqueado ? 'Investigar' : 'Ainda bloqueado'}</button></article>)}</div>
+        </section>
+      </>}
     </main>
   )
 }
