@@ -27,3 +27,4 @@ if(path.startsWith('/profissoes')){const{default:Pagina}=await import('./pages/P
 if(path.startsWith('/dormitorio')){window.location.replace('/');return}
 const{default:App}=await import('./App.jsx');root.render(<StrictMode><SidebarGlobal/><App/></StrictMode>);iniciarPontePerfilSocial();const destino=new URLSearchParams(window.location.search).get('pagina');if(destino){window.setTimeout(()=>{window.dispatchEvent(new CustomEvent('castelobruxo:navegar',{detail:{pagina:destino}}));window.history.replaceState({},'','/')},250)}}catch(error){mostrarErro(error)}}
 iniciar()
+// publicação pública: não usar URLs técnicas de deployment
