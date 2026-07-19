@@ -3,8 +3,8 @@ import { supabase } from '../services/supabase'
 import '../styles/mapa-interativo.css'
 
 const ABAS = [
-  { id: 'interna', nome: 'Áreas internas' },
-  { id: 'externa', nome: 'Áreas externas' },
+  { id: 'interna', nome: 'Mapa interno' },
+  { id: 'externa', nome: 'Mapa externo' },
 ]
 
 export default function MapaInterativo({ perfil, onVoltar, onAbrirLocal }) {
@@ -45,6 +45,9 @@ export default function MapaInterativo({ perfil, onVoltar, onAbrirLocal }) {
 
   const locaisVisiveis = useMemo(() => locais.filter(local => local.ambiente === ambiente).sort((a, b) => (a.ordem || 0) - (b.ordem || 0)), [locais, ambiente])
   const secretos = useMemo(() => locais.filter(local => local.ambiente === 'secreta').sort((a, b) => (a.ordem || 0) - (b.ordem || 0)), [locais])
+  const imagemMapa = ambiente === 'interna'
+    ? '/assets/decoracao-vintage/mapas/mapa-interno.png'
+    : '/assets/decoracao-vintage/mapas/mapa-externo.png'
 
   function trocarAmbiente(novo) {
     setAmbiente(novo)
@@ -76,10 +79,10 @@ export default function MapaInterativo({ perfil, onVoltar, onAbrirLocal }) {
       <header className="mapa-hero">
         <p>Mapa oficial de Castelobruxo</p>
         <h1>Territórios da escola</h1>
-        <span>Somente os locais registrados no mapa oficial fazem parte de Castelobruxo.</span>
+        <span>Os ambientes internos e externos são mostrados em mapas independentes.</span>
       </header>
 
-      <nav className="mapa-abas" aria-label="Divisão do mapa">
+      <nav className="mapa-abas" aria-label="Escolha do mapa">
         {ABAS.map(aba => <button key={aba.id} type="button" className={ambiente === aba.id ? 'ativo' : ''} onClick={() => trocarAmbiente(aba.id)}>{aba.nome}</button>)}
       </nav>
 
@@ -87,11 +90,9 @@ export default function MapaInterativo({ perfil, onVoltar, onAbrirLocal }) {
 
       {carregando ? <p className="mapa-estado">Abrindo o mapa oficial...</p> : <>
         <section className="mapa-layout">
-          <div className={`mapa-oficial mapa-oficial-${ambiente}`} aria-label={ambiente === 'interna' ? 'Representação das áreas internas' : 'Representação das áreas externas'}>
-            <div className="mapa-ilustracao" aria-hidden="true">
-              <span className="mapa-ilustracao-titulo">{ambiente === 'interna' ? 'Planta interna' : 'Território externo'}</span>
-              {locaisVisiveis.map((local, indice) => <button key={local.id} type="button" className={`mapa-ponto mapa-ponto-${indice + 1} ${selecionado?.id === local.id ? 'selecionado' : ''}`} style={{ left: `${local.posicao_x}%`, top: `${local.posicao_y}%` }} onClick={() => setSelecionado(local)} title={local.nome}><span>{indice + 1}</span></button>)}
-            </div>
+          <div className={`mapa-oficial mapa-oficial-${ambiente}`}>
+            <img className="mapa-imagem" src={imagemMapa} alt={ambiente === 'interna' ? 'Mapa interno de Castelobruxo' : 'Mapa externo de Castelobruxo'} />
+            {locaisVisiveis.map((local, indice) => <button key={local.id} type="button" className={`mapa-ponto ${selecionado?.id === local.id ? 'selecionado' : ''}`} style={{ left: `${local.posicao_x}%`, top: `${local.posicao_y}%` }} onClick={() => setSelecionado(local)} title={local.nome}><span>{indice + 1}</span></button>)}
           </div>
 
           <aside className="mapa-painel">
