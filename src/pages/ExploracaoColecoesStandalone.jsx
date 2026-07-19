@@ -4,7 +4,10 @@ import '../styles/exploracao-colecoes.css'
 
 const categorias = ['todas','artefatos','criaturas','plantas','minerais','paginas','reliquias','fotografias','documentos','curiosidades','segredos']
 const nomeRaridade = { comum:'Comum', incomum:'Incomum', raro:'Raro', epico:'Épico', lendario:'Lendário' }
-const mapaGeral='/assets/checkpoint-15/locais/mapa-geral.png'
+const mapasOficiais = {
+  interna: '/assets/decoracao-vintage/mapas/mapa-interno.png',
+  externa: '/assets/decoracao-vintage/mapas/mapa-externo.png',
+}
 
 export default function ExploracaoColecoesStandalone(){
   const [sessao,setSessao]=useState(null)
@@ -19,6 +22,7 @@ export default function ExploracaoColecoesStandalone(){
   const [localAtual,setLocalAtual]=useState(null)
   const [itemAberto,setItemAberto]=useState(null)
   const [aba,setAba]=useState('mapa')
+  const [ambienteMapa,setAmbienteMapa]=useState('interna')
   const [categoria,setCategoria]=useState('todas')
   const [busca,setBusca]=useState('')
   const [respostas,setRespostas]=useState({})
@@ -58,6 +62,7 @@ export default function ExploracaoColecoesStandalone(){
   const percentual=locais.length?Math.round((visitados.size/locais.length)*100):0
   const percentualColecao=catalogo.length?Math.round((minhasColecoes.length/catalogo.length)*100):0
   const localPontos=localAtual?pontos.filter(p=>p.local_id===localAtual.id):[]
+  const locaisDoMapa=useMemo(()=>locais.filter(local=>local.ambiente===ambienteMapa&&!local.secreto),[locais,ambienteMapa])
   const colecoesFiltradas=useMemo(()=>catalogo.filter(c=>{
     const passaCategoria=categoria==='todas'||c.categoria===categoria
     const termo=busca.trim().toLowerCase()
@@ -104,12 +109,15 @@ export default function ExploracaoColecoesStandalone(){
     <nav className="exp-abas"><button className={aba==='mapa'?'ativo':''} onClick={()=>setAba('mapa')}>Mapa</button><button className={aba==='codice'?'ativo':''} onClick={()=>setAba('codice')}>Códice</button><button className={aba==='colecoes'?'ativo':''} onClick={()=>setAba('colecoes')}>Coleções</button>{localAtual&&<button className={aba==='local'?'ativo':''} onClick={()=>setAba('local')}>{localAtual.nome}</button>}</nav>
     {aviso&&<p className="exp-aviso">{aviso}</p>}
 
-    {aba==='mapa'&&<section className="exp-mapa-layout">
-      <aside className="exp-perfil"><div className="exp-avatar">{perfil?.avatar_url?<img src={perfil.avatar_url} alt=""/>:<span>🧭</span>}</div><h3>{perfil?.nome_personagem||perfil?.usuario}</h3><p>{perfil?.tribo||'Sem tribo'} · {perfil?.ano||1}º ano</p><dl><div><dt>Exploração</dt><dd>{perfil?.exploracao||0}</dd></div><div><dt>Nível</dt><dd>{perfil?.nivel||1}</dd></div><div><dt>Locais</dt><dd>{visitados.size}/{locais.length}</dd></div><div><dt>Segredos</dt><dd>{segredosDescobertos.size}/{segredos.length}</dd></div></dl><h4>Progresso das coleções</h4>{progressoCategorias.map(p=><div className="exp-mini-progresso" key={p.categoria}><span>{p.categoria}</span><b>{p.obtidos}/{p.total}</b><i><em style={{width:`${p.percentual}%`}}/></i></div>)}</aside>
-      <section className="exp-mapa" style={{backgroundImage:`linear-gradient(rgba(5,12,8,.18),rgba(5,12,8,.42)),url("${mapaGeral}")`}}>
-        {locais.map(local=>{const bloqueio=requisito(local);const visto=visitados.has(local.id);return <button key={local.id} className={`exp-local ${bloqueio?'bloqueado':''} ${visto?'visitado':''} ${local.secreto?'secreto':''}`} style={{left:`${local.posicao_x||50}%`,top:`${local.posicao_y||50}%`}} onClick={()=>entrar(local)}><span>{bloqueio?'🔒':local.icone||'📍'}</span><strong>{local.secreto&&!visto?'Local desconhecido':local.nome}</strong><small>{bloqueio||(visto?'Visitado':'Não explorado')}</small></button>})}
+    {aba==='mapa'&&<>
+      <nav className="exp-mapa-abas" aria-label="Escolha do mapa"><button className={ambienteMapa==='interna'?'ativo':''} onClick={()=>setAmbienteMapa('interna')}>Mapa interno</button><button className={ambienteMapa==='externa'?'ativo':''} onClick={()=>setAmbienteMapa('externa')}>Mapa externo</button></nav>
+      <section className="exp-mapa-layout">
+        <aside className="exp-perfil"><div className="exp-avatar">{perfil?.avatar_url?<img src={perfil.avatar_url} alt=""/>:<span>🧭</span>}</div><h3>{perfil?.nome_personagem||perfil?.usuario}</h3><p>{perfil?.tribo||'Sem tribo'} · {perfil?.ano||1}º ano</p><dl><div><dt>Exploração</dt><dd>{perfil?.exploracao||0}</dd></div><div><dt>Nível</dt><dd>{perfil?.nivel||1}</dd></div><div><dt>Locais</dt><dd>{visitados.size}/{locais.length}</dd></div><div><dt>Segredos</dt><dd>{segredosDescobertos.size}/{segredos.length}</dd></div></dl><h4>Locais deste mapa</h4><div className="exp-legenda-locais">{locaisDoMapa.map((local,indice)=><button key={local.id} onClick={()=>entrar(local)}><span>{indice+1}</span><strong>{local.nome}</strong></button>)}</div></aside>
+        <section className="exp-mapa" style={{backgroundImage:`url("${mapasOficiais[ambienteMapa]}")`}} aria-label={ambienteMapa==='interna'?'Mapa interno de Castelobruxo':'Mapa externo de Castelobruxo'}>
+          {locaisDoMapa.map((local,indice)=>{const bloqueio=requisito(local);const visto=visitados.has(local.id);return <button key={local.id} className={`exp-local ${bloqueio?'bloqueado':''} ${visto?'visitado':''}`} style={{left:`${local.posicao_x||50}%`,top:`${local.posicao_y||50}%`}} onClick={()=>entrar(local)} title={`${local.nome} — ${bloqueio||(visto?'Visitado':'Não explorado')}`} aria-label={local.nome}><span>{bloqueio?'🔒':indice+1}</span></button>})}
+        </section>
       </section>
-    </section>}
+    </>}
 
     {aba==='local'&&localAtual&&<section className="exp-local-pagina">
       <header className="exp-local-hero" style={localAtual.imagem_url?{backgroundImage:`linear-gradient(90deg,rgba(6,12,8,.96),rgba(6,12,8,.35)),url("${localAtual.imagem_url}")`}:undefined}><button onClick={()=>setAba('mapa')}>← Voltar ao mapa</button><span>{localAtual.icone}</span><div><small>{localAtual.categoria}</small><h2>{localAtual.nome}</h2><p>{localAtual.descricao}</p></div></header>
@@ -117,16 +125,9 @@ export default function ExploracaoColecoesStandalone(){
       <div className="exp-pontos"><h3>Pontos investigáveis</h3>{localPontos.length===0&&<p>Nenhum ponto foi registrado neste local ainda.</p>}{localPontos.map(p=>{const descoberto=pontosDescobertos.has(p.id);return <article key={p.id} className={descoberto?'descoberto':''}><span>{p.icone}</span><div><h4>{p.nome}</h4><p>{p.descricao}</p><small>{p.tipo} · exploração {p.requisito_exploracao} · +{p.xp_recompensa} XP</small>{p.resposta_enigma!==null&&<input value={respostas[p.id]||''} onChange={e=>setRespostas(r=>({...r,[p.id]:e.target.value}))} placeholder="Digite sua resposta ao enigma"/>}</div><button onClick={()=>interagir(p)}>{descoberto?'Revisitar pista':'Investigar'}</button></article>})}</div>
     </section>}
 
-    {aba==='codice'&&<section className="exp-codice">
-      <div className="exp-resumo-grade"><article><strong>{visitados.size}</strong><span>locais visitados</span></article><article><strong>{pontosDescobertos.size}</strong><span>pistas registradas</span></article><article><strong>{segredosDescobertos.size}</strong><span>segredos revelados</span></article><article><strong>{minhasColecoes.length}</strong><span>itens colecionados</span></article></div>
-      <section><h2>Locais registrados</h2><div className="exp-lista-codice">{locais.map(l=><article key={l.id} className={!visitados.has(l.id)?'oculto':''}>{visitados.has(l.id)&&l.imagem_url?<img src={l.imagem_url} alt=""/>:<span>{visitados.has(l.id)?l.icone:'?'}</span>}<div><h3>{visitados.has(l.id)?l.nome:'Entrada não descoberta'}</h3><p>{visitados.has(l.id)?l.ambiente:'Explore o mapa para revelar este registro.'}</p></div></article>)}</div></section>
-      <section><h2>Segredos</h2><div className="exp-lista-codice">{segredos.map(s=>{const aberto=segredosDescobertos.has(s.id);const item=catalogo.find(i=>i.categoria==='segredos'&&i.nome.toLowerCase().includes(s.nome.toLowerCase().replace('a voz','voz')));return <article key={s.id} className={!aberto?'oculto':''}>{aberto&&item?.imagem_url?<img src={item.imagem_url} alt=""/>:<span>{aberto?s.icone:'✦'}</span>}<div><h3>{aberto?s.nome:'Segredo desconhecido'}</h3><p>{aberto?s.descricao_revelada:s.descricao_oculta}</p><small>{aberto?nomeRaridade[s.raridade]:'Continue explorando'}</small></div></article>})}</div></section>
-    </section>}
+    {aba==='codice'&&<section className="exp-codice"><div className="exp-resumo-grade"><article><strong>{visitados.size}</strong><span>locais visitados</span></article><article><strong>{pontosDescobertos.size}</strong><span>pistas registradas</span></article><article><strong>{segredosDescobertos.size}</strong><span>segredos revelados</span></article><article><strong>{minhasColecoes.length}</strong><span>itens colecionados</span></article></div><section><h2>Locais registrados</h2><div className="exp-lista-codice">{locais.map(l=><article key={l.id} className={!visitados.has(l.id)?'oculto':''}>{visitados.has(l.id)&&l.imagem_url?<img src={l.imagem_url} alt=""/>:<span>{visitados.has(l.id)?l.icone:'?'}</span>}<div><h3>{visitados.has(l.id)?l.nome:'Entrada não descoberta'}</h3><p>{visitados.has(l.id)?l.ambiente:'Explore o mapa para revelar este registro.'}</p></div></article>)}</div></section><section><h2>Segredos</h2><div className="exp-lista-codice">{segredos.map(s=>{const aberto=segredosDescobertos.has(s.id);const item=catalogo.find(i=>i.categoria==='segredos'&&i.nome.toLowerCase().includes(s.nome.toLowerCase().replace('a voz','voz')));return <article key={s.id} className={!aberto?'oculto':''}>{aberto&&item?.imagem_url?<img src={item.imagem_url} alt=""/>:<span>{aberto?s.icone:'✦'}</span>}<div><h3>{aberto?s.nome:'Segredo desconhecido'}</h3><p>{aberto?s.descricao_revelada:s.descricao_oculta}</p><small>{aberto?nomeRaridade[s.raridade]:'Continue explorando'}</small></div></article>})}</div></section></section>}
 
-    {aba==='colecoes'&&<section className="exp-colecoes">
-      <header><div><small>Arquivo pessoal</small><h2>Coleções de Castelobruxo</h2><p>{minhasColecoes.length} de {catalogo.length} registros encontrados.</p></div><div className="exp-controles-colecao"><input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar no Códice"/><div className="exp-categorias">{categorias.map(c=><button key={c} className={categoria===c?'ativo':''} onClick={()=>setCategoria(c)}>{c}</button>)}</div></div></header>
-      <div className="exp-grade-colecoes">{colecoesFiltradas.map(item=>{const obtida=colecoesMap.get(item.id);const oculta=item.secreto&&!obtida;return <article key={item.id} className={`${obtida?'obtida':'faltando'} ${oculta?'oculta':''}`} onClick={()=>!oculta&&setItemAberto({...item,obtida})}>{!oculta&&item.imagem_url?<img src={item.imagem_url} alt={item.nome}/>:<span>{oculta?'?':item.icone}</span>}<small>{oculta?'Item secreto':item.categoria}</small><h3>{oculta?'Registro oculto':item.nome}</h3><p>{oculta?'Descubra este item durante uma exploração.':item.descricao}</p><footer><b>{oculta?'Desconhecida':nomeRaridade[item.raridade]}</b><em>{obtida?`Obtido ×${obtida.quantidade}`:'Não encontrado'}</em></footer></article>})}</div>
-    </section>}
+    {aba==='colecoes'&&<section className="exp-colecoes"><header><div><small>Arquivo pessoal</small><h2>Coleções de Castelobruxo</h2><p>{minhasColecoes.length} de {catalogo.length} registros encontrados.</p></div><div className="exp-controles-colecao"><input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar no Códice"/><div className="exp-categorias">{categorias.map(c=><button key={c} className={categoria===c?'ativo':''} onClick={()=>setCategoria(c)}>{c}</button>)}</div></div></header><div className="exp-grade-colecoes">{colecoesFiltradas.map(item=>{const obtida=colecoesMap.get(item.id);const oculta=item.secreto&&!obtida;return <article key={item.id} className={`${obtida?'obtida':'faltando'} ${oculta?'oculta':''}`} onClick={()=>!oculta&&setItemAberto({...item,obtida})}>{!oculta&&item.imagem_url?<img src={item.imagem_url} alt={item.nome}/>:<span>{oculta?'?':item.icone}</span>}<small>{oculta?'Item secreto':item.categoria}</small><h3>{oculta?'Registro oculto':item.nome}</h3><p>{oculta?'Descubra este item durante uma exploração.':item.descricao}</p><footer><b>{oculta?'Desconhecida':nomeRaridade[item.raridade]}</b><em>{obtida?`Obtido ×${obtida.quantidade}`:'Não encontrado'}</em></footer></article>})}</div></section>}
 
     {itemAberto&&<div className="exp-modal" onClick={()=>setItemAberto(null)}><article onClick={e=>e.stopPropagation()}><button onClick={()=>setItemAberto(null)}>×</button>{itemAberto.imagem_url&&<img src={itemAberto.imagem_url} alt={itemAberto.nome}/>}<small>{itemAberto.categoria} · {nomeRaridade[itemAberto.raridade]}</small><h2>{itemAberto.nome}</h2><p>{itemAberto.descricao}</p><blockquote>{itemAberto.historia}</blockquote><dl><div><dt>Origem</dt><dd>{itemAberto.local_origem||'Castelobruxo'}</dd></div><div><dt>Status</dt><dd>{itemAberto.obtida?`Encontrado ×${itemAberto.obtida.quantidade}`:'Ainda não encontrado'}</dd></div></dl></article></div>}
   </main>
