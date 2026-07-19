@@ -1,0 +1,25 @@
+/* Assets oficiais da decoração vintage de Castelobruxo */
+:root{
+  --cb-paper:url('/assets/decoracao-vintage/texturas/papel-1.png');
+  --cb-paper-soft:url('/assets/decoracao-vintage/texturas/papel-8.png');
+  --cb-paper-pattern:url('/assets/decoracao-vintage/texturas/papel-5.png');
+  --cb-wood:url('/assets/decoracao-vintage/texturas/madeira-2.png');
+  --cb-frame:url('/assets/decoracao-vintage/bordas/art-nouveau-1.png');
+  --cb-stars:url('/assets/decoracao-vintage/simbolos/estrelas-e-simbolos.png');
+}
+body{background-image:linear-gradient(rgba(229,220,197,.72),rgba(222,211,185,.72)),var(--cb-paper-pattern);background-size:auto,520px;color:#352d22}
+body::after{content:"";position:fixed;right:-45px;bottom:-35px;width:260px;height:260px;z-index:-1;pointer-events:none;background:url('/assets/decoracao-vintage/botanica/gravura-7.png') center/contain no-repeat;opacity:.14;filter:sepia(.55)}
+:is(main,section,article,aside,header,dialog)[class*="card"],:is(main,section,article,aside,header,dialog)[class*="painel"],:is(main,section,article,aside,header,dialog)[class*="panel"]{background-image:linear-gradient(rgba(243,236,218,.94),rgba(225,213,185,.94)),var(--cb-paper-soft);background-size:auto,420px;color:#3c3327;border-color:#817052!important;box-shadow:0 14px 28px rgba(67,46,24,.16)}
+:is(main,section,article,aside,header,dialog)[class*="card"] h1,:is(main,section,article,aside,header,dialog)[class*="card"] h2,:is(main,section,article,aside,header,dialog)[class*="painel"] h1,:is(main,section,article,aside,header,dialog)[class*="painel"] h2{color:#443726}
+button:not(.cb-sidebar-toggle){border-radius:2px!important;background-image:linear-gradient(rgba(224,213,187,.94),rgba(207,192,157,.94)),var(--cb-paper);color:#473c2d;border:1px solid #7a6749;box-shadow:0 3px 0 rgba(79,57,31,.2)}
+button:not(:disabled):hover{filter:sepia(.08) brightness(1.04)}
+input,textarea,select{color:#3f3528;background-image:linear-gradient(rgba(246,240,225,.92),rgba(232,222,199,.92)),var(--cb-paper-soft);border-color:#8b7858;border-radius:2px}
+input::placeholder,textarea::placeholder{color:#817664}
+.cb-sidebar-global{background-image:linear-gradient(rgba(50,39,26,.91),rgba(40,31,21,.96)),var(--cb-wood)!important;background-size:auto,cover!important}
+.cb-sidebar-global::before{background:linear-gradient(rgba(236,224,194,.07),rgba(0,0,0,.04)),url('/assets/decoracao-vintage/bordas/art-nouveau-3.png') top center/96% auto no-repeat!important;border-color:rgba(221,202,156,.3)!important}
+.cb-sidebar-item{border-radius:2px!important}.cb-sidebar-item-ativo{background-image:linear-gradient(rgba(229,218,190,.2),rgba(148,126,87,.12)),var(--cb-paper-soft)!important}
+.biblioteca-header,.mapa-hero{position:relative;background-image:linear-gradient(rgba(239,231,211,.9),rgba(220,207,176,.9)),var(--cb-paper)!important;background-size:auto,cover!important}
+.biblioteca-header::after,.mapa-hero::after{content:"";position:absolute;right:14px;bottom:10px;width:110px;height:110px;background:url('/assets/decoracao-vintage/botanica/gravura-2.png') center/contain no-repeat;opacity:.18;pointer-events:none}
+.livro-card:nth-child(3n+1)::before{content:"";position:absolute;right:8px;top:8px;width:38px;height:38px;background:url('/assets/decoracao-vintage/selos/selo-2.png') center/contain no-repeat;opacity:.45}
+.livro-card{position:relative}
+@media(max-width:720px){body::after{width:150px;height:150px;opacity:.09}.biblioteca-header::after,.mapa-hero::after{width:70px;height:70px}}
