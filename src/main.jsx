@@ -5,7 +5,9 @@ import './styles/mobile-final.css'
 import './services/supabasePerfilPatch.js'
 import { iniciarPontePerfilSocial } from './socialProfileBridge.jsx'
 import { ativarFallbackDePerfilMobile } from './services/perfilMobileFallback.js'
+import { limparSessaoJwtInvalidaUmaVez } from './services/limparSessaoJwtInvalida.js'
 
+limparSessaoJwtInvalidaUmaVez()
 ativarFallbackDePerfilMobile()
 
 const root = createRoot(document.getElementById('root'))
