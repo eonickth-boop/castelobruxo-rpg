@@ -1,6 +1,7 @@
 @import './styles/dormitorio-assets.css';
 @import './styles/exploracao-colecoes-assets.css';
 @import './styles/tema-vintage-natureza.css';
+@import './styles/exploracao-mapas-fix.css';
 
 :root {
   --text: #d9dfd2;
