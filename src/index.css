@@ -2,6 +2,7 @@
 @import './styles/exploracao-colecoes-assets.css';
 @import './styles/tema-vintage-natureza.css';
 @import './styles/biblioteca-capascss.css';
+@import './styles/correcoes-visuais-checkpoint-16.css';
 
 :root {
   --text: #d9dfd2;
