@@ -17,6 +17,7 @@ if(path.startsWith('/notificacoes')){const{default:Pagina}=await import('./pages
 if(path.startsWith('/moderacao-social')){const{default:Pagina}=await import('./pages/ModeracaoSocialStandalone.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/comunidade')){const{default:Pagina}=await import('./pages/ComunidadeSocialStandalone.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/exploracao')||path.startsWith('/colecoes')){const{default:Pagina}=await import('./pages/ExploracaoColecoesStandalone.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
+if(path.startsWith('/temporadas')){const{default:Pagina}=await import('./pages/Temporadas.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/jornal')){const{default:Pagina}=await import('./pages/JornalCastelobruxo.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/admin-profissoes')){const{default:Pagina}=await import('./pages/PainelProfissoesAdmin.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/profissoes')){const{default:Pagina}=await import('./pages/Profissoes.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
