@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import './styles/mobile-final.css'
 import { iniciarPontePerfilSocial } from './socialProfileBridge.jsx'
 
 const root = createRoot(document.getElementById('root'))
@@ -8,6 +9,7 @@ function mostrarErro(error){console.error('Falha ao iniciar Castelobruxo:',error
 async function renderizarPagina(Pagina,SidebarGlobal){root.render(<StrictMode><SidebarGlobal/><Pagina/></StrictMode>)}
 async function iniciar(){try{const path=window.location.pathname;const{default:SidebarGlobal}=await import('./components/layout/SidebarGlobal.jsx')
 if(path.startsWith('/rpg')){const[{default:RpgCenas},{default:PainelTestesGlobal},{default:PainelItensGlobal},{default:PainelRecompensasGlobal},{default:PainelNpcsGlobal},{default:PainelCampanhasGlobal},{default:CentralNarradorGlobal}]=await Promise.all([import('./pages/RpgCenas.jsx'),import('./components/rpg/PainelTestesGlobal.jsx'),import('./components/rpg/PainelItensGlobal.jsx'),import('./components/rpg/PainelRecompensasGlobal.jsx'),import('./components/rpg/PainelNpcsGlobal.jsx'),import('./components/rpg/PainelCampanhasGlobal.jsx'),import('./components/rpg/CentralNarradorGlobal.jsx')]);root.render(<StrictMode><SidebarGlobal/><RpgCenas/><PainelTestesGlobal/><PainelItensGlobal/><PainelRecompensasGlobal/><PainelNpcsGlobal/><PainelCampanhasGlobal/><CentralNarradorGlobal/></StrictMode>);return}
+if(path.startsWith('/guia')){const{default:Pagina}=await import('./pages/GuiaInicio.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/rotina')){const{default:Pagina}=await import('./pages/RotinaEscolarStandalone.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/tribos')){const{default:Pagina}=await import('./pages/TribosCompletasStandalone.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/chat')){const{default:Pagina}=await import('./pages/ChatPrivadoStandalone.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
