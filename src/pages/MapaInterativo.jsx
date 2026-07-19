@@ -87,8 +87,11 @@ export default function MapaInterativo({ perfil, onVoltar, onAbrirLocal }) {
 
       {carregando ? <p className="mapa-estado">Abrindo o mapa oficial...</p> : <>
         <section className="mapa-layout">
-          <div className={`mapa-oficial mapa-oficial-${ambiente}`}>
-            <img src="/assets/mapa/mapa-oficial-castelobruxo.png" alt={`Mapa oficial — ${ambiente === 'interna' ? 'áreas internas' : 'áreas externas'}`} />
+          <div className={`mapa-oficial mapa-oficial-${ambiente}`} aria-label={ambiente === 'interna' ? 'Representação das áreas internas' : 'Representação das áreas externas'}>
+            <div className="mapa-ilustracao" aria-hidden="true">
+              <span className="mapa-ilustracao-titulo">{ambiente === 'interna' ? 'Planta interna' : 'Território externo'}</span>
+              {locaisVisiveis.map((local, indice) => <button key={local.id} type="button" className={`mapa-ponto mapa-ponto-${indice + 1} ${selecionado?.id === local.id ? 'selecionado' : ''}`} style={{ left: `${local.posicao_x}%`, top: `${local.posicao_y}%` }} onClick={() => setSelecionado(local)} title={local.nome}><span>{indice + 1}</span></button>)}
+            </div>
           </div>
 
           <aside className="mapa-painel">
