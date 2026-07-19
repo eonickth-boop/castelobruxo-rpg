@@ -16,6 +16,7 @@ export default function Biblioteca({ onVoltar }) {
   const [acaoId, setAcaoId] = useState(null)
   const [mensagem, setMensagem] = useState('')
   const [emprestimos, setEmprestimos] = useState([])
+  const [nomeEstudante, setNomeEstudante] = useState('')
 
   useEffect(() => { carregarTudo() }, [])
 
@@ -34,8 +35,14 @@ export default function Biblioteca({ onVoltar }) {
 
   async function carregarEmprestimos() {
     const { data: auth } = await supabase.auth.getUser()
-    if (!auth?.user) { setEmprestimos([]); return }
-    const { data, error } = await supabase.from('biblioteca_emprestimos').select('id, livro_id, emprestado_em, devolucao_prevista, livros(titulo, autor)').is('devolvido_em', null).order('emprestado_em', { ascending: true })
+    if (!auth?.user) { setEmprestimos([]); setNomeEstudante(''); return }
+
+    const [{ data: perfil }, { data, error }] = await Promise.all([
+      supabase.from('perfis').select('nome_personagem, usuario').eq('id', auth.user.id).maybeSingle(),
+      supabase.from('biblioteca_emprestimos').select('id, livro_id, emprestado_em, devolucao_prevista, livros(titulo, autor)').is('devolvido_em', null).order('emprestado_em', { ascending: true }),
+    ])
+
+    setNomeEstudante(perfil?.nome_personagem || perfil?.usuario || 'Estudante')
     if (error) { console.error(error); setMensagem('Não foi possível carregar seu cartão da biblioteca.'); return }
     setEmprestimos(data ?? [])
   }
@@ -83,16 +90,16 @@ export default function Biblioteca({ onVoltar }) {
     <section className="biblioteca-cartao-area">
       <div className="biblioteca-cartao" aria-label="Cartão da Biblioteca de Castelobruxo">
         <div className="biblioteca-cartao-cabecalho"><span>CASTELOBRUXO</span><strong>Cartão da Biblioteca</strong><small>Arquivo Central</small></div>
-        <div className="biblioteca-cartao-titulos"><span>OBRA EMPRESTADA</span><span>DEVOLUÇÃO</span></div>
+        <div className="biblioteca-cartao-titulos"><span>NOME DO ESTUDANTE</span><span>DEVOLUÇÃO</span></div>
         <div className="biblioteca-cartao-linhas">
           {Array.from({ length: LIMITE_CARTAO }, (_, indice) => {
             const item = emprestimos[indice]
-            return <div className="biblioteca-cartao-linha" key={item?.id || indice}><span title={item?.livros?.titulo || ''}>{item?.livros?.titulo || ''}</span><time>{item ? new Date(`${item.devolucao_prevista}T12:00:00`).toLocaleDateString('pt-BR') : ''}</time></div>
+            return <div className="biblioteca-cartao-linha" key={item?.id || indice}><span title={item ? nomeEstudante : ''}>{item ? nomeEstudante : ''}</span><time>{item ? new Date(`${item.devolucao_prevista}T12:00:00`).toLocaleDateString('pt-BR') : ''}</time></div>
           })}
         </div>
         <div className="biblioteca-cartao-rodape">Este cartão pertence ao acervo escolar de Castelobruxo</div>
       </div>
-      <div className="biblioteca-cartao-info"><p>Seu registro de empréstimos</p><h2>Cartão da Biblioteca</h2><span>{emprestimos.length} de {LIMITE_CARTAO} espaços preenchidos</span><small>Ao devolver um livro, o nome e a data são apagados e a linha volta a ficar vazia.</small></div>
+      <div className="biblioteca-cartao-info"><p>Seu registro de empréstimos</p><h2>Cartão da Biblioteca</h2><strong className="biblioteca-cartao-nome">{nomeEstudante || 'Estudante'}</strong><span>{emprestimos.length} de {LIMITE_CARTAO} espaços preenchidos</span><small>Ao devolver um livro, o nome e a data são apagados e a linha volta a ficar vazia.</small></div>
     </section>
 
     <section className="biblioteca-ferramentas"><label className="biblioteca-pesquisa"><span>⌕</span><input type="search" placeholder="Pesquisar por título, autor ou categoria..." value={pesquisa} onChange={e => setPesquisa(e.target.value)} /></label><div className="biblioteca-contador"><strong>{livrosFiltrados.length}</strong><span>{livrosFiltrados.length === 1 ? 'obra encontrada' : 'obras encontradas'}</span></div></section>
