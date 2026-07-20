@@ -8,6 +8,14 @@ function nomePessoa(pessoa) {
   return pessoa?.nome_personagem || pessoa?.usuario || 'Personagem'
 }
 
+function comLimite(promessa, milissegundos = 8000) {
+  let timer
+  const limite = new Promise((_, rejeitar) => {
+    timer = window.setTimeout(() => rejeitar(new Error('Tempo limite excedido.')), milissegundos)
+  })
+  return Promise.race([promessa, limite]).finally(() => window.clearTimeout(timer))
+}
+
 export default function ComunidadeSocialStandalone() {
   const [sessao, setSessao] = useState(null)
   const [perfil, setPerfil] = useState(null)
@@ -25,23 +33,80 @@ export default function ComunidadeSocialStandalone() {
 
   async function carregar() {
     setCarregando(true)
-    const { data: dadosSessao } = await supabase.auth.getSession()
-    const novaSessao = dadosSessao.session
-    setSessao(novaSessao)
-    if (!novaSessao?.user) { setCarregando(false); return }
+    setMensagem('')
 
-    const [resPerfil, resPessoas, resAmizades, resBloqueios] = await Promise.all([
-      supabase.from('perfis').select('id,usuario,nome_personagem,avatar_url,tribo,ano,nivel,cargo').eq('id', novaSessao.user.id).single(),
-      supabase.from('perfis').select('id,usuario,nome_personagem,avatar_url,tribo,ano,nivel,cargo').eq('ativo', true).neq('id', novaSessao.user.id).order('nome_personagem'),
-      supabase.from('social_amizades').select('*').order('atualizado_em', { ascending: false }),
-      supabase.from('social_bloqueios').select('*').order('criado_em', { ascending: false }),
-    ])
+    try {
+      const { data: dadosSessao, error: erroSessao } = await comLimite(
+        supabase.auth.getSession(),
+        5000,
+      )
 
-    setPerfil(resPerfil.data)
-    setPessoas(resPessoas.data || [])
-    setAmizades(resAmizades.data || [])
-    setBloqueios(resBloqueios.data || [])
-    setCarregando(false)
+      if (erroSessao) throw erroSessao
+
+      const novaSessao = dadosSessao?.session ?? null
+      setSessao(novaSessao)
+
+      if (!novaSessao?.user) return
+
+      const resultados = await Promise.allSettled([
+        comLimite(
+          supabase
+            .from('perfis')
+            .select('id,usuario,nome_personagem,avatar_url,tribo,ano,nivel,cargo')
+            .eq('id', novaSessao.user.id)
+            .maybeSingle(),
+        ),
+        comLimite(
+          supabase
+            .from('perfis')
+            .select('id,usuario,nome_personagem,avatar_url,tribo,ano,nivel,cargo')
+            .eq('ativo', true)
+            .neq('id', novaSessao.user.id)
+            .order('nome_personagem'),
+        ),
+        comLimite(
+          supabase
+            .from('social_amizades')
+            .select('*')
+            .order('atualizado_em', { ascending: false }),
+        ),
+        comLimite(
+          supabase
+            .from('social_bloqueios')
+            .select('*')
+            .order('criado_em', { ascending: false }),
+        ),
+      ])
+
+      const valor = (resultado) => resultado.status === 'fulfilled' ? resultado.value : null
+      const resPerfil = valor(resultados[0])
+      const resPessoas = valor(resultados[1])
+      const resAmizades = valor(resultados[2])
+      const resBloqueios = valor(resultados[3])
+
+      setPerfil(resPerfil?.data ?? null)
+      setPessoas(resPessoas?.data ?? [])
+      setAmizades(resAmizades?.data ?? [])
+      setBloqueios(resBloqueios?.data ?? [])
+
+      const erros = [
+        resPerfil?.error,
+        resPessoas?.error,
+        resAmizades?.error,
+        resBloqueios?.error,
+        ...resultados.filter((r) => r.status === 'rejected').map((r) => r.reason),
+      ].filter(Boolean)
+
+      if (erros.length) {
+        console.error('Falha parcial ao carregar a Comunidade:', erros)
+        setMensagem('Parte dos dados da Comunidade não pôde ser carregada. Tente atualizar a página.')
+      }
+    } catch (erro) {
+      console.error('Falha ao abrir a Comunidade:', erro)
+      setMensagem(erro?.message || 'Não foi possível abrir a Comunidade.')
+    } finally {
+      setCarregando(false)
+    }
   }
 
   const bloqueadosIds = useMemo(() => new Set(bloqueios.map((b) => b.bloqueado_id)), [bloqueios])
@@ -111,6 +176,7 @@ export default function ComunidadeSocialStandalone() {
 
   if (carregando) return <main className="social-shell"><p>Preparando a Comunidade...</p></main>
   if (!sessao) return <main className="social-shell social-central"><h1>Comunidade</h1><p>Entre na sua conta para acessar.</p><button onClick={() => { window.location.href = '/' }}>Ir para o portal</button></main>
+  if (!perfil) return <main className="social-shell social-central"><h1>Comunidade</h1><p>{mensagem || 'Não foi possível carregar seu perfil.'}</p><button onClick={carregar}>Tentar novamente</button><button onClick={() => { window.location.href = '/' }}>Voltar ao portal</button></main>
 
   return <main className="social-shell">
     <header className="social-hero"><button onClick={() => { window.location.href = '/' }}>← Portal</button><div><small>Checkpoint 14.2</small><h1>Comunidade de Castelobruxo</h1><p>Encontre personagens, crie vínculos e converse em tempo real.</p></div><aside><span>Amigos</span><strong>{amigos.length}</strong></aside></header>
