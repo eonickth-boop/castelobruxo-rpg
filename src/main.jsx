@@ -2,7 +2,6 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import './styles/mobile-final.css'
-import './services/authenticatedProfileBridge.js'
 import { iniciarPontePerfilSocial } from './socialProfileBridge.jsx'
 
 const root = createRoot(document.getElementById('root'))
