@@ -16,14 +16,22 @@ function prepararConteudo(frame) {
     if (!doc) return
     doc.documentElement.classList.add('cb-social-embutido')
     doc.body?.classList.add('cb-social-embutido')
+
     const style = doc.createElement('style')
+    style.dataset.centralSocial = 'true'
     style.textContent = `
-      .cb-sidebar-global,.cb-sidebar-toggle,.cb-sidebar-overlay{display:none!important}
-      body{margin:0!important;padding:0!important;background:#f4f7fb!important}
+      html,body,#root{width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;padding:0!important;overflow-x:hidden!important;background:#f4f7fb!important}
       body.cb-com-sidebar{padding-left:0!important}
-      main{max-width:none!important;margin:0 auto!important;min-height:100vh!important}
-      @media(max-width:900px){body.cb-com-sidebar{padding-left:0!important}}
+      .cb-sidebar-global,.cb-sidebar-toggle,.cb-sidebar-overlay{display:none!important}
+      main{box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;padding-left:clamp(14px,2vw,28px)!important;padding-right:clamp(14px,2vw,28px)!important;overflow-x:hidden!important}
+      main>*,main section,main article,main div{min-width:0!important;max-width:100%}
+      img,video,canvas,svg{max-width:100%!important;height:auto}
+      [class*="grid"],[class*="grade"],[class*="cards"],[class*="lista"]{min-width:0!important;max-width:100%!important}
+      [class*="grid"],[class*="grade"]{grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))!important}
+      table{display:block!important;max-width:100%!important;overflow-x:auto!important}
+      @media(max-width:900px){body.cb-com-sidebar{padding-left:0!important}main{padding-left:14px!important;padding-right:14px!important}}
     `
+    doc.head.querySelector('style[data-central-social="true"]')?.remove()
     doc.head.appendChild(style)
   } catch (erro) {
     console.warn('Não foi possível ajustar a seção social embutida.', erro)
