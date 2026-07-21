@@ -13,6 +13,7 @@ if(path.startsWith('/rpg')){const[{default:RpgCenas},{default:PainelTestesGlobal
 if(path.startsWith('/guia')){const{default:Pagina}=await import('./pages/GuiaInicio.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/rotina')){const{default:Pagina}=await import('./pages/RotinaEscolarStandalone.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/tribos')){const{default:Pagina}=await import('./pages/TribosCompletasStandalone.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
+if(path.startsWith('/beneficios')){const{default:Pagina}=await import('./pages/RecompensasEscolaStandalone.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/social')){const{default:Pagina}=await import('./pages/CentralSocialStandalone.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/chat')){const{default:Pagina}=await import('./pages/ChatPrivadoStandalone.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/mural')){const{default:Pagina}=await import('./pages/MuralComunidadeStandalone.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
