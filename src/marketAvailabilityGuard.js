@@ -34,10 +34,13 @@ const regrasNormalizadas = new Map(
 
 function aplicarRegras() {
   document.querySelectorAll('.mercado-item').forEach((card) => {
+    if (card.dataset.naoCompravelProcessado === 'true') return
+
     const titulo = card.querySelector('h2')?.textContent?.trim()
     const motivo = regrasNormalizadas.get(normalizar(titulo))
     if (!motivo) return
 
+    card.dataset.naoCompravelProcessado = 'true'
     card.classList.add('mercado-item-institucional')
     card.dataset.naoCompravel = 'true'
 
@@ -58,14 +61,20 @@ function aplicarRegras() {
 }
 
 export function iniciarProtecaoMercado() {
-  const estilo = document.createElement('style')
-  estilo.textContent = `
-    .mercado-item-institucional{border-style:dashed!important;opacity:.92}
-    .mercado-item-institucional .mercado-item-imagem::after{content:'Institucional';position:absolute;right:12px;top:12px;padding:6px 10px;border-radius:999px;background:rgba(8,20,15,.88);border:1px solid rgba(201,164,92,.4);color:#ead9a8;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
-    .mercado-item-institucional .mercado-obtencao{color:#c8d1ca!important;font-size:.92rem!important}
-    .mercado-item-institucional button:disabled{background:#303a33!important;color:#aeb8b0!important;border-color:#4c574f!important;cursor:not-allowed!important;opacity:1!important}
-  `
-  document.head.appendChild(estilo)
+  if (window.__protecaoMercadoIniciada) return
+  window.__protecaoMercadoIniciada = true
+
+  if (!document.getElementById('mercado-institucional-estilos')) {
+    const estilo = document.createElement('style')
+    estilo.id = 'mercado-institucional-estilos'
+    estilo.textContent = `
+      .mercado-item-institucional{border-style:dashed!important;opacity:.92}
+      .mercado-item-institucional .mercado-item-imagem::after{content:'Institucional';position:absolute;right:12px;top:12px;padding:6px 10px;border-radius:999px;background:rgba(8,20,15,.88);border:1px solid rgba(201,164,92,.4);color:#ead9a8;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+      .mercado-item-institucional .mercado-obtencao{color:#c8d1ca!important;font-size:.92rem!important}
+      .mercado-item-institucional button:disabled{background:#303a33!important;color:#aeb8b0!important;border-color:#4c574f!important;cursor:not-allowed!important;opacity:1!important}
+    `
+    document.head.appendChild(estilo)
+  }
 
   document.addEventListener('click', (evento) => {
     const botao = evento.target.closest?.('.mercado-item[data-nao-compravel="true"] button')
@@ -74,9 +83,16 @@ export function iniciarProtecaoMercado() {
     evento.stopImmediatePropagation()
   }, true)
 
-  aplicarRegras()
-  new MutationObserver(aplicarRegras).observe(document.body, {
-    childList: true,
-    subtree: true,
+  let agendado = false
+  const observar = new MutationObserver(() => {
+    if (agendado) return
+    agendado = true
+    requestAnimationFrame(() => {
+      aplicarRegras()
+      agendado = false
+    })
   })
+
+  aplicarRegras()
+  observar.observe(document.body, { childList: true, subtree: true })
 }
