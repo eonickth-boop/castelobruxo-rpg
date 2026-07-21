@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import './styles/mobile-final.css'
 import { iniciarPontePerfilSocial } from './socialProfileBridge.jsx'
+import { iniciarProtecaoMercado } from './marketAvailabilityGuard.js'
 
 const root = createRoot(document.getElementById('root'))
 function mostrarErro(error){console.error('Falha ao iniciar Castelobruxo:',error);root.render(<main style={{maxWidth:'760px',margin:'60px auto',padding:'28px',color:'#eee7d7',background:'rgba(17,25,20,.96)',border:'1px solid rgba(201,164,92,.45)',borderRadius:'18px',fontFamily:'system-ui,sans-serif'}}><h1 style={{color:'#e5c16b'}}>Castelobruxo não conseguiu iniciar</h1><p>A publicação foi concluída, mas ocorreu um erro ao carregar o aplicativo.</p><pre style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere',padding:'16px',background:'#090e0b',borderRadius:'10px'}}>{error?.message||String(error)}</pre><button type="button" onClick={()=>window.location.reload()}>Tentar novamente</button></main>)}
@@ -26,5 +27,6 @@ if(path.startsWith('/admin-profissoes')){const{default:Pagina}=await import('./p
 if(path.startsWith('/profissoes')){const{default:Pagina}=await import('./pages/Profissoes.jsx');await renderizarPagina(Pagina,SidebarGlobal);return}
 if(path.startsWith('/dormitorio')){window.location.replace('/');return}
 const{default:App}=await import('./App.jsx');root.render(<StrictMode><SidebarGlobal/><App/></StrictMode>);iniciarPontePerfilSocial();const destino=new URLSearchParams(window.location.search).get('pagina');if(destino){window.setTimeout(()=>{window.dispatchEvent(new CustomEvent('castelobruxo:navegar',{detail:{pagina:destino}}));window.history.replaceState({},'','/')},250)}}catch(error){mostrarErro(error)}}
+iniciarProtecaoMercado()
 iniciar()
 // publicação pública: não usar URLs técnicas de deployment
