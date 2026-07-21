@@ -470,8 +470,18 @@ function App() {
   }
 
   async function sair() {
-    await supabase.auth.signOut()
+    setCarregando(true)
 
+    const { error } = await supabase.auth.signOut({ scope: 'local' })
+
+    if (error) {
+      console.error('Erro ao sair da conta:', error)
+      setMensagem(error.message || 'Não foi possível sair da conta.')
+      setCarregando(false)
+      return
+    }
+
+    setSessao(null)
     setUsuario('')
     setSenha('')
     setMensagem('')
@@ -490,6 +500,7 @@ function App() {
     setDisciplinaSelecionadaId(null)
     setAulaSelecionada(null)
     setPagina('inicio')
+    setCarregando(false)
   }
 
   if (sessao && !perfil) {
