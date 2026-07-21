@@ -5,7 +5,7 @@ import '../styles/inventario.css'
 
 function normalizarCategoria(valor=''){return String(valor||'Outros').trim()}
 const PASTAS_ITENS={ART:'ART',CRI:'CRIS',LIV:'LIV',PLA:'PLA',POT:'POT',UTE:'UTE',VES:'VEST'}
-function imagemDoItem(item){if(!item)return'';if(item.imagem_url||item.image_url||item.url_imagem)return item.imagem_url||item.image_url||item.url_imagem;if(!item.imagem||!item.id)return'';const pasta=PASTAS_ITENS[String(item.id).slice(0,3)];return pasta?`/assets/${pasta}/${item.imagem}`:''}
+function imagemDoItem(item){if(!item)return'';if(item.imagem_url||item.image_url||item.url_imagem)return item.imagem_url||item.image_url||item.url_imagem;if(!item.imagem||!item.id||item.imagem==='placeholder.webp')return'';const prefixo=String(item.id).slice(0,3);if(['UNI','MAT','COM','ESC','BRO'].includes(prefixo))return`/assets/market/${item.imagem}`;const pasta=PASTAS_ITENS[prefixo];return pasta?`/assets/${pasta}/${item.imagem}`:''}
 function slotDoItem(item={}){const codigo=String(item.id||item.codigo||'').toUpperCase();const cat=normalizarCategoria(item.categoria||item.tipo).toLowerCase();if(codigo.startsWith('VES')||['vestimentas','vestimenta','roupas','roupa'].includes(cat))return'traje';if(codigo.startsWith('ART')||['artefatos','artefato'].includes(cat))return'artefato';if(codigo.startsWith('UTE')||['utensílios','utensilios','utensílio','utensilio'].includes(cat))return'utensilio';if(codigo.startsWith('CRI')||['cristais','cristal','acessórios','acessorios','acessório','acessorio'].includes(cat))return'acessorio';return null}
 const nomesSlots={traje:'Traje',acessorio:'Acessório',artefato:'Artefato',utensilio:'Utensílio'}
 

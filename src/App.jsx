@@ -21,6 +21,7 @@ import CorreioMagico from './pages/CorreioMagico'
 import Conquistas from './pages/Conquistas'
 import Mercado from './pages/Mercado'
 import Inventario from './pages/Inventario'
+import { itemEhCompravel, motivoDeObtencao } from './marketAvailabilityGuard'
 import Certificados from './pages/Certificados'
 import Missoes from './pages/Missoes'
 import Eventos from './pages/Eventos'
@@ -354,6 +355,11 @@ function App() {
   }
 
   async function comprarItem(item) {
+    if (!itemEhCompravel(item)) {
+      setMensagem(`Este item não está à venda. ${motivoDeObtencao(item)}.`)
+      return
+    }
+
     const confirmar = window.confirm(
       `Comprar 1x ${item.nome} por ${item.preco} Ipês?`,
     )

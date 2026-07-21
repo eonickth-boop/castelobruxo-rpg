@@ -1,98 +1,40 @@
-const REGRAS_NAO_COMPRAVEIS = new Map([
-  ['Passe da biblioteca', 'Concedido pela biblioteca'],
-  ['Distintivo de monitor', 'Exclusivo para monitores'],
-  ['Chave mestra', 'Item de missão'],
-  ['Medalha de mérito', 'Recompensa acadêmica'],
-  ['Certificado enrolado', 'Conquista acadêmica'],
-  ['Kit de primeiros socorros', 'Equipamento da escola'],
-  ['Lanterna de corredor', 'Equipamento da escola'],
-  ['Rádio comunicador', 'Uso de funcionários'],
-  ['Convite para evento', 'Obtido em eventos'],
-  ['Passe de transporte', 'Concedido pela escola'],
-  ['Selo acadêmico', 'Uso administrativo'],
-  ['Caixa de correspondência', 'Patrimônio da escola'],
-  ['Broche Yandara', 'Recebido pela tribo'],
-  ['Broche Arayé', 'Recebido pela tribo'],
-  ['Broche Anayru', 'Recebido pela tribo'],
-  ['Broche Aratá', 'Recebido pela tribo'],
-  ['Marmita estudantil', 'Servida no refeitório'],
-  ['Macarrão do refeitório', 'Servido no refeitório'],
-  ['Chá noturno', 'Servido em atividade escolar'],
+const MOTIVOS_POR_ID = new Map([
+  ['ESC_N_01', 'Emitida pela escola ao estudante'],
+  ['ESC_N_07', 'Concedido a monitores oficiais'],
+  ['ESC001', 'Concedido pela biblioteca'],
+  ['ESC002', 'Exclusivo para monitores'],
+  ['ESC003', 'Recompensa especial da administração'],
+  ['ESC004', 'Recompensa por mérito acadêmico'],
+  ['ESC005', 'Recebido ao concluir uma missão'],
+  ['ESC006', 'Liberado a partir do segundo ano'],
+  ['ESC007', 'Liberada para exploradores de nível 2'],
+  ['ESC008', 'Exclusivo para professores e administradores'],
+  ['ESC009', 'Entregue durante eventos oficiais'],
+  ['ESC010', 'Liberado a partir do nível 2'],
+  ['ESC011', 'Concedido pela administração escolar'],
+  ['ESC012', 'Liberada ao completar o perfil público'],
+  ['BRO001', 'Recebido ao ingressar na tribo Yandara'],
+  ['BRO002', 'Recebido ao ingressar na tribo Arayé'],
+  ['BRO003', 'Recebido ao ingressar na tribo Anayru'],
+  ['BRO004', 'Recebido ao ingressar na tribo Aratá'],
+  ['BRO005', 'Recebido ao ingressar na tribo Caora'],
+  ['COM_007', 'Servida no refeitório'],
+  ['COM_008', 'Servido no refeitório'],
+  ['COM_012', 'Servido em atividade escolar'],
 ])
 
-function normalizar(texto = '') {
-  return String(texto)
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim()
-    .toLowerCase()
+export function itemEhCompravel(item) {
+  const preco = Number(item?.preco)
+  return Number.isFinite(preco) && preco > 0
 }
 
-const regrasNormalizadas = new Map(
-  [...REGRAS_NAO_COMPRAVEIS].map(([nome, motivo]) => [normalizar(nome), motivo]),
-)
-
-function aplicarRegras() {
-  document.querySelectorAll('.mercado-item').forEach((card) => {
-    if (card.dataset.naoCompravelProcessado === 'true') return
-
-    const titulo = card.querySelector('h2')?.textContent?.trim()
-    const motivo = regrasNormalizadas.get(normalizar(titulo))
-    if (!motivo) return
-
-    card.dataset.naoCompravelProcessado = 'true'
-    card.classList.add('mercado-item-institucional')
-    card.dataset.naoCompravel = 'true'
-
-    const preco = card.querySelector('.mercado-item-rodape strong')
-    if (preco) {
-      preco.textContent = motivo
-      preco.classList.add('mercado-obtencao')
-    }
-
-    const botao = card.querySelector('.mercado-item-rodape button')
-    if (botao) {
-      botao.disabled = true
-      botao.textContent = 'Não disponível para compra'
-      botao.setAttribute('aria-disabled', 'true')
-      botao.title = motivo
-    }
-  })
+export function motivoDeObtencao(item) {
+  if (itemEhCompravel(item)) return ''
+  return MOTIVOS_POR_ID.get(String(item?.id || ''))
+    || item?.regra_obtencao
+    || 'Obtido por progressão ou concessão da escola'
 }
 
-export function iniciarProtecaoMercado() {
-  if (window.__protecaoMercadoIniciada) return
-  window.__protecaoMercadoIniciada = true
-
-  if (!document.getElementById('mercado-institucional-estilos')) {
-    const estilo = document.createElement('style')
-    estilo.id = 'mercado-institucional-estilos'
-    estilo.textContent = `
-      .mercado-item-institucional{border-style:dashed!important;opacity:.92}
-      .mercado-item-institucional .mercado-item-imagem::after{content:'Institucional';position:absolute;right:12px;top:12px;padding:6px 10px;border-radius:999px;background:rgba(8,20,15,.88);border:1px solid rgba(201,164,92,.4);color:#ead9a8;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
-      .mercado-item-institucional .mercado-obtencao{color:#c8d1ca!important;font-size:.92rem!important}
-      .mercado-item-institucional button:disabled{background:#303a33!important;color:#aeb8b0!important;border-color:#4c574f!important;cursor:not-allowed!important;opacity:1!important}
-    `
-    document.head.appendChild(estilo)
-  }
-
-  document.addEventListener('click', (evento) => {
-    const botao = evento.target.closest?.('.mercado-item[data-nao-compravel="true"] button')
-    if (!botao) return
-    evento.preventDefault()
-    evento.stopImmediatePropagation()
-  }, true)
-
-  let agendado = false
-  const observar = new MutationObserver(() => {
-    if (agendado) return
-    agendado = true
-    requestAnimationFrame(() => {
-      aplicarRegras()
-      agendado = false
-    })
-  })
-
-  aplicarRegras()
-  observar.observe(document.body, { childList: true, subtree: true })
-}
+// Compatibilidade com o ponto de entrada antigo. As regras agora são
+// renderizadas pelo React e validadas antes da RPC, sem observar o DOM.
+export function iniciarProtecaoMercado() {}

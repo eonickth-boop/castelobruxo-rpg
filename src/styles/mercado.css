@@ -170,6 +170,31 @@
   border-radius: 999px;
 }
 
+.mercado-item-imagem em {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  padding: 6px 10px;
+  border: 1px solid rgba(201,164,92,.4);
+  border-radius: 999px;
+  color: #ead9a8;
+  background: rgba(8,20,15,.88);
+  font-size: .72rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mercado-item-institucional {
+  border-style: dashed;
+}
+
+.mercado-obtencao {
+  color: #c8d1ca !important;
+  font-size: .92rem !important;
+}
+
 .mercado-item-conteudo {
   flex: 1;
   display: flex;

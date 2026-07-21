@@ -18,7 +18,11 @@ function imagemDoItem(item) {
     return item.imagem_url || item.image_url || item.url_imagem
   }
   if (!item.imagem || !item.id) return ''
-  const pasta = PASTAS_ITENS[String(item.id).slice(0, 3)]
+  const prefixo = String(item.id).slice(0, 3)
+  if (['UNI', 'MAT', 'COM', 'ESC', 'BRO'].includes(prefixo)) {
+    return item.imagem === 'placeholder.webp' ? '' : `/assets/market/${item.imagem}`
+  }
+  const pasta = PASTAS_ITENS[prefixo]
   return pasta ? `/assets/${pasta}/${item.imagem}` : ''
 }
 

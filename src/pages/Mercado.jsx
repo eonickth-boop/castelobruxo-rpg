@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import Notificacao from '../components/Notificacao'
+import { itemEhCompravel, motivoDeObtencao } from '../marketAvailabilityGuard'
 import '../styles/mercado.css'
 
 const CATEGORIAS = [
@@ -38,7 +39,6 @@ function normalizarCategoria(valor = '') {
 
 const PASTAS_ITENS = {
   ART: 'ART', CRI: 'CRIS', LIV: 'LIV', PLA: 'PLA', POT: 'POT', UTE: 'UTE', VES: 'VEST',
-  UNI: 'mercado/uniformes', MAT: 'mercado/materiais', COM: 'mercado/comidas', ESC: 'mercado/escola', BRO: 'mercado/broches',
 }
 
 function imagemDoItem(item) {
@@ -46,9 +46,19 @@ function imagemDoItem(item) {
   if (item.imagem_url || item.image_url || item.url_imagem) return item.imagem_url || item.image_url || item.url_imagem
   if (!item.imagem || !item.id || item.imagem === 'placeholder.webp') return ''
   const prefixo = String(item.id).slice(0, 3)
+  if (['UNI', 'MAT', 'COM', 'ESC', 'BRO'].includes(prefixo)) {
+    return `/assets/market/${item.imagem}`
+  }
   const pasta = PASTAS_ITENS[prefixo]
   if (!pasta) return ''
   return `/assets/${pasta}/${item.imagem}`
+}
+
+function ImagemItem({ src, alt }) {
+  const [falhou, setFalhou] = useState(false)
+  return src && !falhou
+    ? <img src={src} alt={alt} onError={() => setFalhou(true)} />
+    : <span aria-hidden="true">✦</span>
 }
 
 export default function Mercado({ perfil, saldo, itens = [], itemComprando, mensagem, onComprar, onAbrirInventario, onVoltar }) {
@@ -106,19 +116,21 @@ export default function Mercado({ perfil, saldo, itens = [], itemComprando, mens
             const comprando = itemComprando === item.id
             const categoriaItem = normalizarCategoria(item.categoria || item.tipo)
             const imagem = imagemDoItem(item)
+            const compravel = itemEhCompravel(item)
+            const motivoObtencao = motivoDeObtencao(item)
             return (
-              <article className="mercado-item" key={item.id}>
+              <article className={`mercado-item${compravel ? '' : ' mercado-item-institucional'}`} key={item.id}>
                 <div className="mercado-item-imagem">
-                  {imagem ? <img src={imagem} alt={item.nome} onError={(evento) => { evento.currentTarget.style.display = 'none'; evento.currentTarget.nextElementSibling?.removeAttribute('hidden') }} /> : null}
-                  <span hidden={Boolean(imagem)}>✦</span>
+                  <ImagemItem src={imagem} alt={item.nome} />
+                  {!compravel && <em>Institucional</em>}
                   <small>{categoriaItem}</small>
                 </div>
                 <div className="mercado-item-conteudo">
                   <h2>{item.nome}</h2>
                   <p>{item.descricao || 'Item mágico disponível no mercado.'}</p>
                   <div className="mercado-item-rodape">
-                    <strong>💰 {preco} Ipês</strong>
-                    <button type="button" disabled={comprando || semSaldo} onClick={() => onComprar?.(item)}>{comprando ? 'Comprando...' : semSaldo ? 'Saldo insuficiente' : 'Comprar'}</button>
+                    <strong className={compravel ? '' : 'mercado-obtencao'}>{compravel ? `💰 ${preco} Ipês` : motivoObtencao}</strong>
+                    {compravel && <button type="button" disabled={comprando || semSaldo} onClick={() => onComprar?.(item)}>{comprando ? 'Comprando...' : semSaldo ? 'Saldo insuficiente' : 'Comprar'}</button>}
                   </div>
                 </div>
               </article>
