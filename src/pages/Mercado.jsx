@@ -4,6 +4,11 @@ import '../styles/mercado.css'
 
 const CATEGORIAS = [
   'Todos',
+  'Uniformes',
+  'Materiais Escolares',
+  'Comidas',
+  'Itens da Escola',
+  'Institucionais',
   'Poções',
   'Plantas',
   'Artefatos',
@@ -16,6 +21,12 @@ const CATEGORIAS = [
 function normalizarCategoria(valor = '') {
   const texto = String(valor).trim().toLowerCase()
   const mapa = {
+    uniforme: 'Uniformes', uniformes: 'Uniformes',
+    material: 'Materiais Escolares', materiais: 'Materiais Escolares',
+    'material escolar': 'Materiais Escolares', 'materiais escolares': 'Materiais Escolares',
+    comida: 'Comidas', comidas: 'Comidas', alimento: 'Comidas', alimentos: 'Comidas',
+    'item da escola': 'Itens da Escola', 'itens da escola': 'Itens da Escola',
+    institucional: 'Institucionais', institucionais: 'Institucionais',
     pocao: 'Poções', pocoes: 'Poções', poção: 'Poções', poções: 'Poções',
     planta: 'Plantas', plantas: 'Plantas', artefato: 'Artefatos', artefatos: 'Artefatos',
     livro: 'Livros', livros: 'Livros', vestimenta: 'Vestimentas', vestimentas: 'Vestimentas',
@@ -25,12 +36,15 @@ function normalizarCategoria(valor = '') {
   return mapa[texto] || valor || 'Outros'
 }
 
-const PASTAS_ITENS = { ART: 'ART', CRI: 'CRIS', LIV: 'LIV', PLA: 'PLA', POT: 'POT', UTE: 'UTE', VES: 'VEST' }
+const PASTAS_ITENS = {
+  ART: 'ART', CRI: 'CRIS', LIV: 'LIV', PLA: 'PLA', POT: 'POT', UTE: 'UTE', VES: 'VEST',
+  UNI: 'mercado/uniformes', MAT: 'mercado/materiais', COM: 'mercado/comidas', ESC: 'mercado/escola', BRO: 'mercado/broches',
+}
 
 function imagemDoItem(item) {
   if (!item) return ''
   if (item.imagem_url || item.image_url || item.url_imagem) return item.imagem_url || item.image_url || item.url_imagem
-  if (!item.imagem || !item.id) return ''
+  if (!item.imagem || !item.id || item.imagem === 'placeholder.webp') return ''
   const prefixo = String(item.id).slice(0, 3)
   const pasta = PASTAS_ITENS[prefixo]
   if (!pasta) return ''
@@ -94,7 +108,11 @@ export default function Mercado({ perfil, saldo, itens = [], itemComprando, mens
             const imagem = imagemDoItem(item)
             return (
               <article className="mercado-item" key={item.id}>
-                <div className="mercado-item-imagem">{imagem ? <img src={imagem} alt={item.nome} /> : <span>✦</span>}<small>{categoriaItem}</small></div>
+                <div className="mercado-item-imagem">
+                  {imagem ? <img src={imagem} alt={item.nome} onError={(evento) => { evento.currentTarget.style.display = 'none'; evento.currentTarget.nextElementSibling?.removeAttribute('hidden') }} /> : null}
+                  <span hidden={Boolean(imagem)}>✦</span>
+                  <small>{categoriaItem}</small>
+                </div>
                 <div className="mercado-item-conteudo">
                   <h2>{item.nome}</h2>
                   <p>{item.descricao || 'Item mágico disponível no mercado.'}</p>
