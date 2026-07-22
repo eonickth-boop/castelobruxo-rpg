@@ -36,7 +36,7 @@ export default function CriacaoPersonagem({ perfil, onConcluido, sair }) {
   const inicial = perfil?.criacao_rascunho || {}
   const [etapa, setEtapa] = useState(Number(inicial.etapa) || 1)
   const [dados, setDados] = useState({
-    nome: inicial.nome || perfil?.nome_personagem || '', apelido: inicial.apelido || '', idade: inicial.idade || perfil?.idade_personagem || '', aniversario: inicial.aniversario || '', ano: Number(inicial.ano || perfil?.ano || 1), pronomes: inicial.pronomes || perfil?.pronomes || '', origem: inicial.origem || perfil?.origem || '', tipoCriacao: inicial.tipoCriacao || '', relacaoMagia: inicial.relacaoMagia || '', chamado: inicial.chamado || '', qualidades: inicial.qualidades || [], defeitos: inicial.defeitos || [], medo: inicial.medo || '', desejo: inicial.desejo || '', habito: inicial.habito || '', conflito: inicial.conflito || '', bio: inicial.bio || perfil?.bio || '', lembranca: inicial.lembranca || '', vinculo: inicial.vinculo || '', segredo: inicial.segredo || '', motivo: inicial.motivo || '', materiaInteresse: inicial.materiaInteresse || '', materiaTemor: inicial.materiaTemor || '', afinidadeNatureza: inicial.afinidadeNatureza || '', afinidadeCriaturas: inicial.afinidadeCriaturas || '', afinidadePocoes: inicial.afinidadePocoes || '', afinidadeExploracao: inicial.afinidadeExploracao || '', afinidadeDefesa: inicial.afinidadeDefesa || '', aparencia: inicial.aparencia || '', altura: inicial.altura || '', estilo: inicial.estilo || '', objeto: inicial.objeto || '', juramento: inicial.juramento || false,
+    nome: inicial.nome || perfil?.nome_personagem || '', apelido: inicial.apelido || '', idade: inicial.idade || perfil?.idade_personagem || '', aniversario: inicial.aniversario || '', ano: Number(inicial.ano || perfil?.ano || 1), pronomes: inicial.pronomes || perfil?.pronomes || '', origem: inicial.origem || perfil?.origem || '', tipoCriacao: inicial.tipoCriacao || '', relacaoMagia: inicial.relacaoMagia || '', chamado: inicial.chamado || '', qualidades: Array.isArray(inicial.qualidades) ? inicial.qualidades : [], defeitos: Array.isArray(inicial.defeitos) ? inicial.defeitos : [], medo: inicial.medo || '', desejo: inicial.desejo || '', habito: inicial.habito || '', conflito: inicial.conflito || '', bio: inicial.bio || perfil?.bio || '', lembranca: inicial.lembranca || '', vinculo: inicial.vinculo || '', segredo: inicial.segredo || '', motivo: inicial.motivo || '', materiaInteresse: inicial.materiaInteresse || '', materiaTemor: inicial.materiaTemor || '', afinidadeNatureza: inicial.afinidadeNatureza || '', afinidadeCriaturas: inicial.afinidadeCriaturas || '', afinidadePocoes: inicial.afinidadePocoes || '', afinidadeExploracao: inicial.afinidadeExploracao || '', afinidadeDefesa: inicial.afinidadeDefesa || '', aparencia: inicial.aparencia || '', altura: inicial.altura || '', estilo: inicial.estilo || '', objeto: inicial.objeto || '', juramento: inicial.juramento || false,
   })
   const [avatar, setAvatar] = useState(null)
   const [banner, setBanner] = useState(null)
@@ -52,12 +52,38 @@ export default function CriacaoPersonagem({ perfil, onConcluido, sair }) {
 
   function alterar(campo, valor) { setDados((atual) => ({ ...atual, [campo]: valor })); setSalvo(false) }
 
+  async function salvarRascunho(etapaDestino = etapa) {
+    if (!perfil?.id || perfil?.personagem_criado) return true
+
+    setSalvando(true)
+    setSalvo(false)
+
+    const { error } = await supabase.rpc('salvar_rascunho_criacao', {
+      p_rascunho: {
+        ...dados,
+        qualidades: Array.isArray(dados.qualidades) ? dados.qualidades : [],
+        defeitos: Array.isArray(dados.defeitos) ? dados.defeitos : [],
+        etapa: etapaDestino,
+      },
+    })
+
+    setSalvando(false)
+
+    if (error) {
+      console.error('Erro ao salvar rascunho:', error)
+      setMensagem(error.message || 'Não foi possível salvar sua ficha. Verifique sua conexão e tente novamente.')
+      return false
+    }
+
+    setSalvo(true)
+    return true
+  }
+
   useEffect(() => {
-    const timer = setTimeout(async () => {
-      if (!perfil?.id || perfil?.personagem_criado) return
-      const { error } = await supabase.rpc('salvar_rascunho_criacao', { p_rascunho: { ...dados, etapa } })
-      if (!error) setSalvo(true)
+    const timer = setTimeout(() => {
+      salvarRascunho(etapa)
     }, 900)
+
     return () => clearTimeout(timer)
   }, [dados, etapa, perfil?.id, perfil?.personagem_criado])
 
@@ -67,7 +93,18 @@ export default function CriacaoPersonagem({ perfil, onConcluido, sair }) {
     setMensagem(''); return true
   }
 
-  function avancar() { if (!validar()) return; setEtapa((e) => Math.min(capitulos.length, e + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+  async function avancar() {
+    if (!validar()) return
+
+    const proximaEtapa = Math.min(capitulos.length, etapa + 1)
+    const salvou = await salvarRascunho(proximaEtapa)
+
+    if (!salvou) return
+
+    setEtapa(proximaEtapa)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   function voltar() { setMensagem(''); setEtapa((e) => Math.max(1, e - 1)) }
 
   function selecionarArquivo(tipo, arquivo) {
@@ -104,7 +141,7 @@ export default function CriacaoPersonagem({ perfil, onConcluido, sair }) {
 
   return <main className="criacao-personagem"><div className="criacao-fundo" /><section className="criacao-painel criacao-painel-imersivo">
     <header className="criacao-cabecalho"><img src="/assets/logo/castelobruxo-logo.png" alt="Castelobruxo" /><div><p>Prólogo de entrada</p><h1>Seu primeiro registro</h1><span>As páginas deste livro guardarão quem você era antes de cruzar os portões — e quem escolhe se tornar.</span></div></header>
-    <div className="criacao-progresso"><div><span style={{ width: `${progresso}%` }} /></div><small>Capítulo {etapa} de {capitulos.length} · {salvo ? 'rascunho salvo' : 'salvando...'}</small></div>
+    <div className="criacao-progresso"><div><span style={{ width: `${progresso}%` }} /></div><small>Capítulo {etapa} de {capitulos.length} · {salvando ? 'salvando...' : salvo ? 'rascunho salvo' : 'alterações pendentes'}</small></div>
     {mensagem && <p className="criacao-mensagem">{mensagem}</p>}
     <div className="criacao-corpo"><section className="criacao-conteudo"><div className="criacao-titulo-etapa"><span>{String(etapa).padStart(2,'0')}</span><div><p>{titulo}</p><h2>{subtitulo}</h2></div></div>
 
@@ -122,6 +159,6 @@ export default function CriacaoPersonagem({ perfil, onConcluido, sair }) {
 
     {etapa === 7 && <div className="criacao-juramento"><blockquote>“Diante da floresta, dos rios, dos ventos, das chamas e das sombras, prometo aprender sem esquecer quem sou, proteger sem buscar glória e escolher com responsabilidade o tipo de magia que deixarei no mundo.”</blockquote><label><input type="checkbox" checked={dados.juramento} onChange={(e) => alterar('juramento', e.target.checked)} /><span>Eu confirmo este registro e aceito seguir para a Cerimônia dos Guardiões.</span></label><div className="criacao-resumo criacao-resumo-final"><p>Registro final</p><h3>{resumo.nome}</h3><dl><div><dt>Origem</dt><dd>{resumo.origem}</dd></div><div><dt>Traço</dt><dd>{resumo.traco}</dd></div><div><dt>Objetivo</dt><dd>{resumo.objetivo}</dd></div><div><dt>Ano</dt><dd>{dados.ano}º ano</dd></div></dl><p>{dados.bio}</p></div></div>}
     </section><aside className="criacao-ficha-viva"><small>Ficha viva</small><h3>{resumo.nome}</h3><p>{resumo.origem}</p><dl><div><dt>Traço central</dt><dd>{resumo.traco}</dd></div><div><dt>Desejo</dt><dd>{resumo.objetivo}</dd></div><div><dt>Capítulo atual</dt><dd>{titulo}</dd></div></dl><p className="criacao-frase">Cada resposta altera a forma como seu personagem será apresentado no perfil e interpretado no RPG.</p></aside></div>
-    <div className="criacao-acoes"><button type="button" className="criacao-sair" onClick={sair}>Sair</button><div>{etapa > 1 && <button type="button" onClick={voltar}>Voltar</button>}{etapa < capitulos.length ? <button type="button" onClick={avancar}>Continuar</button> : <button type="button" onClick={concluirCriacao} disabled={salvando}>{salvando ? 'Selando registro...' : 'Selar registro'}</button>}</div></div>
+    <div className="criacao-acoes"><button type="button" className="criacao-sair" onClick={sair}>Sair</button><div>{etapa > 1 && <button type="button" onClick={voltar}>Voltar</button>}{etapa < capitulos.length ? <button type="button" onClick={avancar} disabled={salvando}>{salvando ? 'Salvando...' : 'Continuar'}</button> : <button type="button" onClick={concluirCriacao} disabled={salvando}>{salvando ? 'Selando registro...' : 'Selar registro'}</button>}</div></div>
   </section></main>
 }
