@@ -55,28 +55,35 @@ export default function CriacaoPersonagem({ perfil, onConcluido, sair }) {
   async function salvarRascunho(etapaDestino = etapa) {
     if (!perfil?.id || perfil?.personagem_criado) return true
 
-    setSalvando(true)
     setSalvo(false)
 
-    const { error } = await supabase.rpc('salvar_rascunho_criacao', {
-      p_rascunho: {
-        ...dados,
-        qualidades: Array.isArray(dados.qualidades) ? dados.qualidades : [],
-        defeitos: Array.isArray(dados.defeitos) ? dados.defeitos : [],
-        etapa: etapaDestino,
-      },
-    })
+    try {
+      const requisicao = supabase.rpc('salvar_rascunho_criacao', {
+        p_rascunho: {
+          ...dados,
+          qualidades: Array.isArray(dados.qualidades) ? dados.qualidades : [],
+          defeitos: Array.isArray(dados.defeitos) ? dados.defeitos : [],
+          etapa: etapaDestino,
+        },
+      })
 
-    setSalvando(false)
+      const limite = new Promise((resolve) => {
+        window.setTimeout(() => resolve({ error: new Error('O salvamento demorou mais que o esperado.') }), 8000)
+      })
 
-    if (error) {
-      console.error('Erro ao salvar rascunho:', error)
-      setMensagem(error.message || 'Não foi possível salvar sua ficha. Verifique sua conexão e tente novamente.')
+      const { error } = await Promise.race([requisicao, limite])
+
+      if (error) {
+        console.error('Erro ao salvar rascunho:', error)
+        return false
+      }
+
+      setSalvo(true)
+      return true
+    } catch (error) {
+      console.error('Erro inesperado ao salvar rascunho:', error)
       return false
     }
-
-    setSalvo(true)
-    return true
   }
 
   useEffect(() => {
@@ -97,14 +104,18 @@ export default function CriacaoPersonagem({ perfil, onConcluido, sair }) {
     if (!validar()) return
 
     const proximaEtapa = Math.min(capitulos.length, etapa + 1)
-    const salvou = await salvarRascunho(proximaEtapa)
 
-    if (!salvou) return
+    setSalvando(true)
+    const salvou = await salvarRascunho(proximaEtapa)
+    setSalvando(false)
+
+    if (!salvou) {
+      setMensagem('Você avançou, mas o rascunho ainda não foi salvo no servidor. Ele tentará novamente automaticamente.')
+    }
 
     setEtapa(proximaEtapa)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-
   function voltar() { setMensagem(''); setEtapa((e) => Math.max(1, e - 1)) }
 
   function selecionarArquivo(tipo, arquivo) {
