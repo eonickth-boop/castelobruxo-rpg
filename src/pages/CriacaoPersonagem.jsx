@@ -137,15 +137,56 @@ export default function CriacaoPersonagem({ perfil, onConcluido, sair }) {
   }
 
   async function concluirCriacao() {
-    if (!validar()) return
-    setSalvando(true); setMensagem('')
+    if (!validar() || salvando) return
+
+    setSalvando(true)
+    setMensagem('Selando os dados do personagem...')
+
     try {
-      await Promise.all([enviarMidia('avatar', avatar), enviarMidia('banner', banner)])
-      const { data, error } = await supabase.rpc('concluir_criacao_personagem', { p_nome_personagem: dados.nome.trim(), p_idade_personagem: Number(dados.idade), p_ano: Number(dados.ano), p_pronomes: dados.pronomes.trim() || null, p_origem: dados.origem.trim(), p_traco_principal: tracoPrincipal, p_bio: dados.bio.trim(), p_detalhes: dados })
+      const conclusao = supabase.rpc('concluir_criacao_personagem', {
+        p_nome_personagem: dados.nome.trim(),
+        p_idade_personagem: Number(dados.idade),
+        p_ano: Number(dados.ano),
+        p_pronomes: dados.pronomes.trim() || null,
+        p_origem: dados.origem.trim(),
+        p_traco_principal: tracoPrincipal,
+        p_bio: dados.bio.trim(),
+        p_detalhes: dados,
+      })
+
+      const midias = Promise.allSettled([
+        enviarMidia('avatar', avatar),
+        enviarMidia('banner', banner),
+      ])
+
+      const limite = new Promise((_, rejeitar) => {
+        window.setTimeout(() => {
+          rejeitar(new Error('A conclusão demorou mais que o esperado. Verifique sua conexão e tente novamente.'))
+        }, 15000)
+      })
+
+      const [{ data, error }, resultadosMidia] = await Promise.race([
+        Promise.all([conclusao, midias]),
+        limite,
+      ])
+
       if (error) throw error
-      setMensagem('Registro selado. A Cerimônia dos Guardiões começará agora.')
+
+      const midiaFalhou = resultadosMidia.some((resultado) => resultado.status === 'rejected')
+
+      setMensagem(
+        midiaFalhou
+          ? 'Registro selado. Uma das imagens não foi enviada, mas poderá ser adicionada depois.'
+          : 'Registro selado. A Cerimônia dos Guardiões começará agora.',
+      )
+
       onConcluido?.(data)
-    } catch (error) { setMensagem(error.message || 'Não foi possível concluir a criação.') } finally { setSalvando(false) }
+    } catch (error) {
+      console.error('Erro ao concluir personagem:', error)
+      setMensagem(error?.message || 'Não foi possível concluir a criação do personagem.')
+    } finally {
+      setSalvando(false)
+    }
   }
 
   const [titulo, subtitulo] = capitulos[etapa - 1]
