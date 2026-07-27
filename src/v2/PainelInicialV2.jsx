@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import RegistroV2 from './RegistroV2'
 import VidaEscolarV2 from './VidaEscolarV2'
+import ComunidadeV2 from './ComunidadeV2'
 import './painel-inicial-v2.css'
 
 const secoes = [
@@ -35,7 +36,7 @@ export default function PainelInicialV2() {
   function navegar(id) {
     setSecao(id)
     setMenuAberto(false)
-    if (!['inicio', 'registro', 'escola'].includes(id)) setAviso(`${secoes.find(([codigo]) => codigo === id)?.[1]} será construída na próxima etapa.`)
+    if (!['inicio', 'registro', 'escola', 'comunidade'].includes(id)) setAviso(`${secoes.find(([codigo]) => codigo === id)?.[1]} será construída na próxima etapa.`)
     else setAviso('')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -70,6 +71,8 @@ export default function PainelInicialV2() {
           <RegistroV2 onVoltar={() => navegar('inicio')} />
         ) : secao === 'escola' ? (
           <VidaEscolarV2 onVoltar={() => navegar('inicio')} />
+        ) : secao === 'comunidade' ? (
+          <ComunidadeV2 onVoltar={() => navegar('inicio')} />
         ) : (
           <>
             <header className="painel-v2-topbar">
