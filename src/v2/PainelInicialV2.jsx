@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import RegistroV2 from './RegistroV2'
 import './painel-inicial-v2.css'
 
 const secoes = [
@@ -33,8 +34,9 @@ export default function PainelInicialV2() {
   function navegar(id) {
     setSecao(id)
     setMenuAberto(false)
-    if (id !== 'inicio') setAviso(`${secoes.find(([codigo]) => codigo === id)?.[1]} será construída na próxima etapa.`)
+    if (!['inicio', 'registro'].includes(id)) setAviso(`${secoes.find(([codigo]) => codigo === id)?.[1]} será construída na próxima etapa.`)
     else setAviso('')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
@@ -63,71 +65,77 @@ export default function PainelInicialV2() {
       </aside>
 
       <section className="painel-v2-conteudo">
-        <header className="painel-v2-topbar">
-          <div><small>REGISTRO ACADÊMICO · {data.toUpperCase()}</small><h1>Painel do estudante</h1></div>
-          <div className="painel-v2-topacoes">
-            <button type="button" aria-label="Pesquisar">⌕</button>
-            <button type="button" aria-label="Notificações">♢<span>3</span></button>
-          </div>
-        </header>
+        {secao === 'registro' ? (
+          <RegistroV2 onVoltar={() => navegar('inicio')} />
+        ) : (
+          <>
+            <header className="painel-v2-topbar">
+              <div><small>REGISTRO ACADÊMICO · {data.toUpperCase()}</small><h1>Painel do estudante</h1></div>
+              <div className="painel-v2-topacoes">
+                <button type="button" aria-label="Pesquisar">⌕</button>
+                <button type="button" aria-label="Notificações">♢<span>3</span></button>
+              </div>
+            </header>
 
-        {aviso && <div className="painel-v2-aviso" role="status"><strong>Em construção</strong><span>{aviso}</span><button type="button" onClick={() => setAviso('')}>×</button></div>}
+            {aviso && <div className="painel-v2-aviso" role="status"><strong>Em construção</strong><span>{aviso}</span><button type="button" onClick={() => setAviso('')}>×</button></div>}
 
-        <section className="painel-v2-hero">
-          <div>
-            <small>ARQUIVO DO DIA</small>
-            <h2>A escola está desperta, Nicolas.</h2>
-            <p>Há novas aulas, histórias e acontecimentos registrados para sua jornada de hoje.</p>
-            <div className="painel-v2-acoes">
-              <button type="button" onClick={() => setAviso('Sua próxima atividade foi marcada no painel.')}>Continuar jornada</button>
-              <button type="button" className="secundario" onClick={() => navegar('registro')}>Abrir meu registro</button>
+            <section className="painel-v2-hero">
+              <div>
+                <small>ARQUIVO DO DIA</small>
+                <h2>A escola está desperta, Nicolas.</h2>
+                <p>Há novas aulas, histórias e acontecimentos registrados para sua jornada de hoje.</p>
+                <div className="painel-v2-acoes">
+                  <button type="button" onClick={() => setAviso('Sua próxima atividade foi marcada no painel.')}>Continuar jornada</button>
+                  <button type="button" className="secundario" onClick={() => navegar('registro')}>Abrir meu registro</button>
+                </div>
+              </div>
+              <div className="painel-v2-selo"><span>CB</span><small>Fundado sob a floresta</small></div>
+            </section>
+
+            <section className="painel-v2-resumo" aria-label="Resumo do estudante">
+              <article><small>PROGRESSO ACADÊMICO</small><strong>72%</strong><span>3º ano em andamento</span><div><i style={{ width: '72%' }} /></div></article>
+              <article><small>MOEDA ESCOLAR</small><strong>1.280</strong><span>Ipês disponíveis</span></article>
+              <article><small>REPUTAÇÃO</small><strong>Respeitado</strong><span>+18 pontos este ciclo</span></article>
+              <article><small>MISSÕES</small><strong>3 ativas</strong><span>1 termina hoje</span></article>
+            </section>
+
+            <div className="painel-v2-grade">
+              <section className="painel-v2-bloco painel-v2-agenda">
+                <header><div><small>AGENDA</small><h3>Próximas atividades</h3></div><button type="button" onClick={() => navegar('escola')}>Ver rotina</button></header>
+                <div>
+                  {atividades.map((item) => (
+                    <article key={`${item.horario}-${item.titulo}`}>
+                      <time>{item.horario}</time>
+                      <div><strong>{item.titulo}</strong><span>{item.local}</span></div>
+                      <em>{item.tipo}</em>
+                    </article>
+                  ))}
+                </div>
+              </section>
+
+              <section className="painel-v2-bloco painel-v2-avisos">
+                <header><div><small>QUADRO OFICIAL</small><h3>Avisos recentes</h3></div></header>
+                <div>
+                  {avisos.map((item) => (
+                    <article key={item.titulo}><span>{item.selo}</span><strong>{item.titulo}</strong><p>{item.texto}</p></article>
+                  ))}
+                </div>
+              </section>
             </div>
-          </div>
-          <div className="painel-v2-selo"><span>CB</span><small>Fundado sob a floresta</small></div>
-        </section>
 
-        <section className="painel-v2-resumo" aria-label="Resumo do estudante">
-          <article><small>PROGRESSO ACADÊMICO</small><strong>72%</strong><span>3º ano em andamento</span><div><i style={{ width: '72%' }} /></div></article>
-          <article><small>MOEDA ESCOLAR</small><strong>1.280</strong><span>Ipês disponíveis</span></article>
-          <article><small>REPUTAÇÃO</small><strong>Respeitado</strong><span>+18 pontos este ciclo</span></article>
-          <article><small>MISSÕES</small><strong>3 ativas</strong><span>1 termina hoje</span></article>
-        </section>
+            <section className="painel-v2-bloco painel-v2-atalhos">
+              <header><div><small>ACESSO RÁPIDO</small><h3>Continue sua jornada</h3></div></header>
+              <div>
+                <button type="button" onClick={() => navegar('escola')}><span>01</span><strong>Aulas</strong><small>Materiais, tarefas e notas</small></button>
+                <button type="button" onClick={() => navegar('comunidade')}><span>02</span><strong>Comunidade</strong><small>Posts, grupos e mensagens</small></button>
+                <button type="button" onClick={() => navegar('exploracao')}><span>03</span><strong>Mapa</strong><small>Locais, trilhas e descobertas</small></button>
+                <button type="button" onClick={() => setAviso('O inventário será conectado aos itens existentes depois da aprovação visual.')}><span>04</span><strong>Inventário</strong><small>Itens, moedas e coleções</small></button>
+              </div>
+            </section>
 
-        <div className="painel-v2-grade">
-          <section className="painel-v2-bloco painel-v2-agenda">
-            <header><div><small>AGENDA</small><h3>Próximas atividades</h3></div><button type="button" onClick={() => navegar('escola')}>Ver rotina</button></header>
-            <div>
-              {atividades.map((item) => (
-                <article key={`${item.horario}-${item.titulo}`}>
-                  <time>{item.horario}</time>
-                  <div><strong>{item.titulo}</strong><span>{item.local}</span></div>
-                  <em>{item.tipo}</em>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="painel-v2-bloco painel-v2-avisos">
-            <header><div><small>QUADRO OFICIAL</small><h3>Avisos recentes</h3></div></header>
-            <div>
-              {avisos.map((item) => (
-                <article key={item.titulo}><span>{item.selo}</span><strong>{item.titulo}</strong><p>{item.texto}</p></article>
-              ))}
-            </div>
-          </section>
-        </div>
-
-        <section className="painel-v2-bloco painel-v2-atalhos">
-          <header><div><small>ACESSO RÁPIDO</small><h3>Continue sua jornada</h3></div></header>
-          <div>
-            <button type="button" onClick={() => navegar('escola')}><span>01</span><strong>Aulas</strong><small>Materiais, tarefas e notas</small></button>
-            <button type="button" onClick={() => navegar('comunidade')}><span>02</span><strong>Comunidade</strong><small>Posts, grupos e mensagens</small></button>
-            <button type="button" onClick={() => navegar('exploracao')}><span>03</span><strong>Mapa</strong><small>Locais, trilhas e descobertas</small></button>
-            <button type="button" onClick={() => setAviso('O inventário será conectado aos itens existentes depois da aprovação visual.')}><span>04</span><strong>Inventário</strong><small>Itens, moedas e coleções</small></button>
-          </div>
-        </section>
-
-        <footer className="painel-v2-rodape"><span>Castelobruxo RPG · Reconstrução V2</span><a href="/studio-v2">Voltar ao Studio Visual</a></footer>
+            <footer className="painel-v2-rodape"><span>Castelobruxo RPG · Reconstrução V2</span><a href="/studio-v2">Voltar ao Studio Visual</a></footer>
+          </>
+        )}
       </section>
     </main>
   )
