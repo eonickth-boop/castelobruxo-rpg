@@ -3,6 +3,7 @@ import RegistroV2 from './RegistroV2'
 import VidaEscolarV2 from './VidaEscolarV2'
 import ComunidadeV2 from './ComunidadeV2'
 import ExploracaoV2 from './ExploracaoV2'
+import InventarioV2 from './InventarioV2'
 import './painel-inicial-v2.css'
 
 const secoes = [
@@ -11,6 +12,7 @@ const secoes = [
   ['escola', 'Vida escolar'],
   ['comunidade', 'Comunidade'],
   ['exploracao', 'Exploração'],
+  ['inventario', 'Inventário'],
 ]
 
 const atividades = [
@@ -37,8 +39,7 @@ export default function PainelInicialV2() {
   function navegar(id) {
     setSecao(id)
     setMenuAberto(false)
-    if (!['inicio', 'registro', 'escola', 'comunidade', 'exploracao'].includes(id)) setAviso(`${secoes.find(([codigo]) => codigo === id)?.[1]} será construída na próxima etapa.`)
-    else setAviso('')
+    setAviso('')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -76,6 +77,8 @@ export default function PainelInicialV2() {
           <ComunidadeV2 onVoltar={() => navegar('inicio')} />
         ) : secao === 'exploracao' ? (
           <ExploracaoV2 onVoltar={() => navegar('inicio')} />
+        ) : secao === 'inventario' ? (
+          <InventarioV2 onVoltar={() => navegar('inicio')} />
         ) : (
           <>
             <header className="painel-v2-topbar">
@@ -86,7 +89,7 @@ export default function PainelInicialV2() {
               </div>
             </header>
 
-            {aviso && <div className="painel-v2-aviso" role="status"><strong>Em construção</strong><span>{aviso}</span><button type="button" onClick={() => setAviso('')}>×</button></div>}
+            {aviso && <div className="painel-v2-aviso" role="status"><strong>Informação</strong><span>{aviso}</span><button type="button" onClick={() => setAviso('')}>×</button></div>}
 
             <section className="painel-v2-hero">
               <div>
@@ -138,7 +141,7 @@ export default function PainelInicialV2() {
                 <button type="button" onClick={() => navegar('escola')}><span>01</span><strong>Aulas</strong><small>Materiais, tarefas e notas</small></button>
                 <button type="button" onClick={() => navegar('comunidade')}><span>02</span><strong>Comunidade</strong><small>Posts, grupos e mensagens</small></button>
                 <button type="button" onClick={() => navegar('exploracao')}><span>03</span><strong>Mapa</strong><small>Locais, trilhas e descobertas</small></button>
-                <button type="button" onClick={() => setAviso('O inventário será conectado aos itens existentes depois da aprovação visual.')}><span>04</span><strong>Inventário</strong><small>Itens, moedas e coleções</small></button>
+                <button type="button" onClick={() => navegar('inventario')}><span>04</span><strong>Inventário</strong><small>Itens, moedas e coleções</small></button>
               </div>
             </section>
 
