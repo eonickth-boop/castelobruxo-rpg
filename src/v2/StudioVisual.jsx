@@ -1,83 +1,54 @@
-import { useState } from 'react'
 import './studio-visual.css'
 
-const direcoes = [
-  {
-    id: 'arquivo-vivo',
-    nome: 'Arquivo Vivo',
-    subtitulo: 'Acadêmico, antigo e sofisticado',
-    descricao: 'Papel artesanal, madeira escura, selos, fichas escolares e detalhes botânicos discretos.',
-    classes: 'tema-arquivo',
-  },
-  {
-    id: 'floresta-encantada',
-    nome: 'Floresta Encantada',
-    subtitulo: 'Imersivo, natural e misterioso',
-    descricao: 'Verdes profundos, luz filtrada, pedra úmida, folhas e magia integrada à floresta brasileira.',
-    classes: 'tema-floresta',
-  },
-  {
-    id: 'academia-celeste',
-    nome: 'Academia Celeste',
-    subtitulo: 'Noturno, mágico e elegante',
-    descricao: 'Azul noturno, dourado envelhecido, mapas celestes, brilho suave e interfaces mais limpas.',
-    classes: 'tema-celeste',
-  },
+const cores = [
+  ['Verde floresta', '#15231b'],
+  ['Madeira', '#5a3d2b'],
+  ['Creme de papel', '#efe5cc'],
+  ['Dourado envelhecido', '#b99655'],
+  ['Terracota', '#9a5e49'],
 ]
 
-function Amostra({ direcao, ativa, onSelect }) {
-  return (
-    <button
-      type="button"
-      className={`studio-amostra ${direcao.classes} ${ativa ? 'ativa' : ''}`}
-      onClick={() => onSelect(direcao.id)}
-      aria-pressed={ativa}
-    >
-      <span className="studio-selo">CB</span>
-      <span className="studio-amostra-conteudo">
-        <small>Direção visual</small>
-        <strong>{direcao.nome}</strong>
-        <em>{direcao.subtitulo}</em>
-        <span>{direcao.descricao}</span>
-      </span>
-      <span className="studio-selecionar">{ativa ? 'Selecionada' : 'Escolher direção'}</span>
-    </button>
-  )
-}
-
 export default function StudioVisual() {
-  const [direcaoAtiva, setDirecaoAtiva] = useState('arquivo-vivo')
-  const escolhida = direcoes.find((item) => item.id === direcaoAtiva)
-
   return (
-    <main className={`studio-v2 ${escolhida?.classes || ''}`}>
+    <main className="studio-v2 tema-arquivo">
       <header className="studio-topo">
         <div>
           <p>Castelobruxo RPG · Reconstrução V2</p>
-          <h1>Studio Visual</h1>
-          <span>Escolha uma base. Depois refinaremos cada parte juntos.</span>
+          <h1>Arquivo Vivo</h1>
+          <span>Direção oficial · intensidade equilibrada</span>
         </div>
-        <span className="studio-status">Ambiente seguro · não altera o site atual</span>
+        <span className="studio-status">Identidade aprovada</span>
       </header>
 
       <section className="studio-introducao">
         <div>
-          <small>ETAPA 01</small>
-          <h2>Qual deve ser a sensação do novo Castelobruxo?</h2>
-          <p>As três propostas usam a mesma estrutura. A escolha muda cores, materiais, ornamentos e atmosfera.</p>
+          <small>ETAPA 02</small>
+          <h2>O sistema visual do novo Castelobruxo</h2>
+          <p>Uma interface acadêmica, antiga e sofisticada, com leitura confortável, materiais discretos e magia institucional.</p>
         </div>
         <div className="studio-progresso"><span /></div>
       </section>
 
-      <section className="studio-grade-direcoes">
-        {direcoes.map((direcao) => (
-          <Amostra
-            key={direcao.id}
-            direcao={direcao}
-            ativa={direcao.id === direcaoAtiva}
-            onSelect={setDirecaoAtiva}
-          />
-        ))}
+      <section className="studio-regra-visual">
+        <article><strong>70%</strong><span>estrutura limpa e legível</span></article>
+        <article><strong>20%</strong><span>materiais e texturas discretas</span></article>
+        <article><strong>10%</strong><span>ornamentos mágicos e institucionais</span></article>
+      </section>
+
+      <section className="studio-paleta">
+        <div>
+          <small>Paleta oficial</small>
+          <h2>Cores do Arquivo Vivo</h2>
+        </div>
+        <div className="studio-cores">
+          {cores.map(([nome, cor]) => (
+            <article key={nome}>
+              <span style={{ background: cor }} />
+              <strong>{nome}</strong>
+              <small>{cor}</small>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="studio-preview">
@@ -85,19 +56,28 @@ export default function StudioVisual() {
           <div className="studio-mini-logo">C</div>
           <nav>
             <button className="ativo">Início</button>
-            <button>Perfil</button>
+            <button>Meu registro</button>
             <button>Vida escolar</button>
             <button>Comunidade</button>
             <button>Exploração</button>
           </nav>
+          <div className="studio-selo-lateral">Arquivo 027</div>
         </aside>
 
         <div className="studio-pagina-preview">
+          <div className="studio-ficha-topo">
+            <span>REGISTRO ACADÊMICO</span>
+            <span>27 · JUL · 2026</span>
+          </div>
+
           <div className="studio-hero-preview">
             <small>Bem-vindo de volta</small>
             <h2>Nicolas, a escola está desperta.</h2>
-            <p>Há novas aulas, acontecimentos e histórias esperando por você.</p>
-            <button type="button">Continuar jornada</button>
+            <p>Há novas aulas, acontecimentos e histórias esperando por você nos arquivos de hoje.</p>
+            <div className="studio-acoes">
+              <button type="button">Continuar jornada</button>
+              <button type="button" className="secundario">Abrir registro</button>
+            </div>
           </div>
 
           <div className="studio-cards-preview">
@@ -122,10 +102,10 @@ export default function StudioVisual() {
 
       <footer className="studio-rodape">
         <div>
-          <small>Direção selecionada</small>
-          <strong>{escolhida?.nome}</strong>
+          <small>Direção oficial</small>
+          <strong>Arquivo Vivo · Equilibrado</strong>
         </div>
-        <p>Esta escolha ainda é uma prévia e poderá ser misturada com elementos das outras propostas.</p>
+        <p>Esta tela agora mostra a base real que será usada nos próximos componentes e páginas da V2.</p>
       </footer>
     </main>
   )
