@@ -1,0 +1,53 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #f4ecd8;
+  background: #08110d;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: radial-gradient(circle at top, #173525 0, #08110d 45%); }
+button, input { font: inherit; }
+button { cursor: pointer; }
+
+.cb-loading, .cb-auth-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.cb-auth-card { width: min(440px, 100%); padding: 34px; border: 1px solid rgba(217, 181, 98, .28); border-radius: 24px; background: rgba(12, 25, 18, .94); box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+.cb-auth-card h1, .cb-page h1 { margin: 8px 0 10px; font-family: Georgia, serif; color: #f0cf7a; }
+.cb-auth-card p, .cb-page p { color: #b9c7bc; line-height: 1.6; }
+.cb-auth-card form { display: grid; gap: 16px; margin-top: 24px; }
+.cb-auth-card label { display: grid; gap: 8px; font-weight: 700; }
+.cb-auth-card input { width: 100%; border: 1px solid #31483a; border-radius: 12px; padding: 13px 14px; color: #fff; background: #09110d; }
+.cb-auth-card button, .cb-sidebar button { border: 0; border-radius: 12px; padding: 12px 14px; color: #fff; background: #6f8f42; font-weight: 800; }
+.cb-feedback { padding: 12px 14px; border-radius: 12px; background: rgba(163, 63, 63, .18); }
+.cb-eyebrow { color: #d9b562; font-size: .75rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+
+.cb-app-shell { min-height: 100vh; display: grid; grid-template-columns: 270px minmax(0, 1fr); }
+.cb-sidebar { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 28px; padding: 26px 20px; border-right: 1px solid rgba(217,181,98,.18); background: rgba(6, 15, 10, .94); }
+.cb-brand { display: flex; align-items: center; gap: 12px; }
+.cb-brand-mark { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; background: linear-gradient(135deg, #d9b562, #7b4a20); color: #132018; font: 900 1.3rem Georgia, serif; }
+.cb-brand strong, .cb-brand small { display: block; }
+.cb-brand small { margin-top: 3px; color: #829488; }
+.cb-sidebar nav { display: grid; gap: 8px; }
+.cb-sidebar nav button { width: 100%; text-align: left; color: #c5d1c8; background: transparent; }
+.cb-sidebar nav button:hover, .cb-sidebar nav button.is-active { color: #fff4d2; background: rgba(111, 143, 66, .2); }
+.cb-sidebar-footer { margin-top: auto; display: grid; gap: 10px; color: #b9c7bc; }
+.cb-sidebar-footer button { background: #27382d; }
+
+.cb-main { min-width: 0; padding: 42px; }
+.cb-page { width: min(1180px, 100%); margin: 0 auto; display: grid; gap: 24px; }
+.cb-hero, .cb-page-header { padding: 34px; border: 1px solid rgba(217,181,98,.22); border-radius: 26px; background: linear-gradient(135deg, rgba(28, 57, 40, .96), rgba(10, 24, 16, .96)); }
+.cb-hero h1, .cb-page-header h1 { font-size: clamp(2rem, 5vw, 4rem); }
+.cb-grid { display: grid; gap: 18px; }
+.cb-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cb-card { padding: 24px; border: 1px solid rgba(217,181,98,.16); border-radius: 20px; background: rgba(15, 29, 21, .92); }
+.cb-card small { color: #d9b562; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
+.cb-card h2 { margin: 8px 0; font-family: Georgia, serif; }
+
+@media (max-width: 900px) {
+  .cb-app-shell { grid-template-columns: 1fr; }
+  .cb-sidebar { position: static; height: auto; }
+  .cb-sidebar nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cb-main { padding: 22px; }
+  .cb-grid-3 { grid-template-columns: 1fr; }
+}
