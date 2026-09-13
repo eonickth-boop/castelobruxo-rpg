@@ -1,9 +1,0 @@
-INSTALADOR CORRIGIDO — DECORAÇÃO VINTAGE CASTELOBRUXO
-
-1. Extraia este ZIP dentro da pasta raiz do projeto castelobruxo-rpg.
-2. Abra o PowerShell nessa pasta.
-3. Execute:
-
-powershell -ExecutionPolicy Bypass -File .\instalar-no-projeto.ps1
-
-Esta versão detecta quando os assets já estão dentro da pasta correta e não tenta copiar a pasta sobre ela mesma.
