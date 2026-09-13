@@ -1,0 +1,16 @@
+INSTALADOR — DORMITÓRIOS REAIS
+
+1. Extraia este ZIP.
+2. Abra o PowerShell na pasta do projeto castelobruxo-rpg.
+3. Execute:
+
+   powershell -ExecutionPolicy Bypass -File "CAMINHO_DO_ZIP\instalar-no-projeto.ps1" -Projeto "."
+
+O instalador:
+- cria backup dos assets antigos;
+- copia todos os quartos e packs de móveis;
+- faz git add, commit e push;
+- permite que a Vercel publique automaticamente.
+
+O código do site já foi preparado para usar:
+public/assets/dormitorios/<tema>/quarto.png
