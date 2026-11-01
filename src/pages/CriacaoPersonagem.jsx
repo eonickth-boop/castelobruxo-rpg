@@ -67,11 +67,12 @@ export default function CriacaoPersonagem({ perfil, onConcluido, sair }) {
         },
       })
 
-      const limite = new Promise((resolve) => {
-        window.setTimeout(() => resolve({ error: new Error('O salvamento demorou mais que o esperado.') }), 8000)
-      })
+      const avisoDemora = window.setTimeout(() => {
+        console.warn('Rascunho: salvamento demorando mais que o esperado.')
+      }, 8000)
 
-      const { error } = await Promise.race([requisicao, limite])
+      const { error } = await requisicao
+      window.clearTimeout(avisoDemora)
 
       if (error) {
         console.error('Erro ao salvar rascunho:', error)
@@ -94,9 +95,48 @@ export default function CriacaoPersonagem({ perfil, onConcluido, sair }) {
     return () => clearTimeout(timer)
   }, [dados, etapa, perfil?.id, perfil?.personagem_criado])
 
+  // Cada capitulo informa exatamente o que falta, em vez de uma frase generica.
+  const PENDENCIAS = {
+    1: () => {
+      if (dados.nome.trim().length < 3) return 'Escreva o nome completo (pelo menos 3 letras).'
+      const idade = Number(dados.idade)
+      if (!Number.isInteger(idade) || idade < 11 || idade > 99) return 'Informe a idade entre 11 e 99 anos.'
+      return null
+    },
+    2: () => {
+      if (dados.origem.trim().length < 2) return 'Informe a cidade, região ou comunidade de origem.'
+      if (!dados.tipoCriacao) return 'Escolha como o personagem cresceu.'
+      if (dados.chamado.trim().length < 20) return `Conte como recebeu o chamado (faltam ${20 - dados.chamado.trim().length} caracteres).`
+      return null
+    },
+    3: () => {
+      if (dados.qualidades.length !== 3) return `Escolha exatamente 3 qualidades (você marcou ${dados.qualidades.length}).`
+      if (dados.defeitos.length !== 2) return `Escolha exatamente 2 defeitos (você marcou ${dados.defeitos.length}).`
+      if (dados.medo.trim().length < 3) return 'Escreva o maior medo do personagem.'
+      if (dados.desejo.trim().length < 3) return 'Escreva o maior desejo do personagem.'
+      return null
+    },
+    4: () => {
+      if (dados.bio.trim().length < 80) return `A história precisa ter pelo menos 80 caracteres (faltam ${80 - dados.bio.trim().length}).`
+      if (dados.motivo.trim().length < 20) return `Explique por que deseja estudar em Castelobruxo (faltam ${20 - dados.motivo.trim().length} caracteres).`
+      return null
+    },
+    5: () => {
+      if (!dados.materiaInteresse) return 'Escolha a matéria que mais desperta interesse.'
+      if (!dados.materiaTemor) return 'Escolha a matéria que mais intimida.'
+      return null
+    },
+    6: () => {
+      if (dados.aparencia.trim().length < 20) return `Descreva a aparência (faltam ${20 - dados.aparencia.trim().length} caracteres).`
+      if (dados.objeto.trim().length < 2) return 'Informe o objeto que o personagem sempre carrega.'
+      return null
+    },
+    7: () => (dados.juramento ? null : 'Marque a confirmação do juramento para selar o registro.'),
+  }
+
   function validar() {
-    const falhas = { 1: dados.nome.trim().length < 3 || !Number.isInteger(Number(dados.idade)) || Number(dados.idade) < 11 || Number(dados.idade) > 99, 2: dados.origem.trim().length < 2 || !dados.tipoCriacao || dados.chamado.trim().length < 20, 3: dados.qualidades.length !== 3 || dados.defeitos.length !== 2 || dados.medo.trim().length < 3 || dados.desejo.trim().length < 3, 4: dados.bio.trim().length < 80 || dados.motivo.trim().length < 20, 5: !dados.materiaInteresse || !dados.materiaTemor, 6: dados.aparencia.trim().length < 20 || dados.objeto.trim().length < 2, 7: !dados.juramento }
-    if (falhas[etapa]) { setMensagem('Complete os campos essenciais deste capítulo antes de continuar.'); return false }
+    const pendencia = PENDENCIAS[etapa]?.()
+    if (pendencia) { setMensagem(pendencia); return false }
     setMensagem(''); return true
   }
 
@@ -159,16 +199,12 @@ export default function CriacaoPersonagem({ perfil, onConcluido, sair }) {
         enviarMidia('banner', banner),
       ])
 
-      const limite = new Promise((_, rejeitar) => {
-        window.setTimeout(() => {
-          rejeitar(new Error('A conclusão demorou mais que o esperado. Verifique sua conexão e tente novamente.'))
-        }, 15000)
-      })
+      const avisoDemora = window.setTimeout(() => {
+        console.warn('Conclusao do personagem demorando mais que o esperado.')
+      }, 15000)
 
-      const [{ data, error }, resultadosMidia] = await Promise.race([
-        Promise.all([conclusao, midias]),
-        limite,
-      ])
+      const [{ data, error }, resultadosMidia] = await Promise.all([conclusao, midias])
+      window.clearTimeout(avisoDemora)
 
       if (error) throw error
 
@@ -183,6 +219,19 @@ export default function CriacaoPersonagem({ perfil, onConcluido, sair }) {
       onConcluido?.(data)
     } catch (error) {
       console.error('Erro ao concluir personagem:', error)
+
+      const { data: perfilAtualizado } = await supabase
+        .from('perfis')
+        .select('personagem_criado, selecao_tribo_concluida')
+        .eq('id', perfil.id)
+        .maybeSingle()
+
+      if (perfilAtualizado?.personagem_criado) {
+        setMensagem('Registro selado. A Cerimônia dos Guardiões começará agora.')
+        onConcluido?.(perfilAtualizado)
+        return
+      }
+
       setMensagem(error?.message || 'Não foi possível concluir a criação do personagem.')
     } finally {
       setSalvando(false)
