@@ -1,0 +1,461 @@
+/* ==========================================================================
+   Castelobruxo — Sistema de design "Livro Antigo"
+   Base de tokens visuais. Trocar estes valores muda o site inteiro.
+   Nenhuma classe existente foi removida: so recebeu acabamento de livro.
+   ========================================================================== */
+
+:root {
+  /* --- Paleta: verde de Castelobruxo + ouro antigo + azul escuro novo --- */
+  --cb-verde-noite: #07100b;
+  --cb-verde-fundo: #0a1510;
+  --cb-verde-painel: #10201a;
+  --cb-verde-alto: #173025;
+  --cb-verde-linha: #1e3a2c;
+
+  --cb-azul-tinta: #0d1a2b;
+  --cb-azul-painel: #12263d;
+  --cb-azul-alto: #1a3554;
+  --cb-azul-linha: #24466d;
+  --cb-azul-claro: #6fa0d8;
+
+  --cb-ouro: #c7a85a;
+  --cb-ouro-claro: #e8cf8d;
+  --cb-ouro-forte: #b8912f;
+  --cb-pergaminho: #efe3c4;
+  --cb-pergaminho-fosco: #d8c9a4;
+
+  --cb-texto: #d9dfd2;
+  --cb-texto-suave: #a3b2a6;
+  --cb-texto-fraco: #7d8d82;
+
+  /* --- Papel e textura --- */
+  --cb-papel-fundo:
+    radial-gradient(circle at 12% 8%, rgba(199, 168, 90, .05), transparent 42%),
+    radial-gradient(circle at 88% 92%, rgba(18, 38, 61, .5), transparent 48%),
+    linear-gradient(168deg, var(--cb-verde-painel), var(--cb-verde-noite) 72%);
+  --cb-lombada: linear-gradient(90deg, rgba(199, 168, 90, .22), transparent 12%, transparent 88%, rgba(199, 168, 90, .14));
+
+  /* --- Tipografia de livro --- */
+  --cb-fonte-titulo: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, "Times New Roman", serif;
+  --cb-fonte-corpo: "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --cb-fonte-interface: "Trebuchet MS", system-ui, "Segoe UI", sans-serif;
+
+  /* --- Formas --- */
+  --cb-raio: 4px;
+  --cb-raio-painel: 6px;
+  --cb-linha-fina: 1px solid rgba(199, 168, 90, .24);
+  --cb-linha-forte: 1px solid rgba(199, 168, 90, .45);
+  --cb-sombra: 0 18px 44px rgba(0, 0, 0, .42);
+  --cb-sombra-folha: 0 1px 0 rgba(232, 207, 141, .06), 0 24px 60px rgba(0, 0, 0, .5);
+
+  /* --- Realces --- */
+  --cb-realce-verde: rgba(30, 58, 44, .55);
+  --cb-realce-azul: rgba(26, 53, 84, .55);
+  --cb-veludo: inset 0 1px 0 rgba(232, 207, 141, .07);
+}
+
+/* ==========================================================================
+   Aplicacao da base
+   ========================================================================== */
+
+:root {
+  --text: var(--cb-texto);
+  --text-h: var(--cb-ouro-claro);
+  --bg: var(--cb-verde-noite);
+  --border: rgba(199, 168, 90, .24);
+  --accent: var(--cb-ouro);
+  --accent-bg: rgba(199, 168, 90, .13);
+  --accent-border: rgba(199, 168, 90, .45);
+  --social-bg: rgba(13, 26, 43, .72);
+  --sans: var(--cb-fonte-interface);
+  --heading: var(--cb-fonte-titulo);
+}
+
+body {
+  background-color: var(--cb-verde-noite);
+  background-image: var(--cb-papel-fundo);
+  background-attachment: fixed;
+}
+
+h1, h2, h3 {
+  font-family: var(--cb-fonte-titulo);
+  text-wrap: balance;
+}
+
+h1 {
+  letter-spacing: -.018em;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, .45), 0 0 42px rgba(199, 168, 90, .07);
+}
+
+h2 {
+  letter-spacing: -.008em;
+}
+
+/* Filete ornamental sob os titulos de secao, como cabeca de capitulo */
+h2::after {
+  content: "";
+  display: block;
+  width: 66px;
+  height: 1px;
+  margin-top: 10px;
+  background: linear-gradient(90deg, var(--cb-ouro), rgba(199, 168, 90, 0));
+}
+
+/* ==========================================================================
+   Cards — "fichas de arquivo"
+   Um so tratamento, aplicado as superficies que o site ja usa.
+   ========================================================================== */
+
+.pav-card,
+.pav-prioridade,
+.pav-resumo article,
+.perfil-social-integrado,
+.criacao-painel,
+.rpg-card-cena,
+.mural-post,
+.pav-missao,
+.pav-evento,
+.pav-recompensa {
+  position: relative;
+  border: var(--cb-linha-fina);
+  border-radius: var(--cb-raio-painel);
+  background:
+    var(--cb-lombada),
+    linear-gradient(180deg, rgba(23, 48, 37, .82), rgba(10, 21, 16, .92));
+  box-shadow: var(--cb-sombra-folha), var(--cb-veludo);
+  overflow: hidden;
+}
+
+/* Cantos de ficha: pequenos vincos dourados em diagonal */
+.pav-card::before,
+.perfil-social-integrado::before,
+.rpg-card-cena::before,
+.mural-post::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  border: 1px solid rgba(199, 168, 90, .12);
+  border-radius: 2px;
+  background:
+    linear-gradient(135deg, rgba(199, 168, 90, .18) 0 7px, transparent 7px) left top / 14px 14px no-repeat,
+    linear-gradient(315deg, rgba(199, 168, 90, .18) 0 7px, transparent 7px) right bottom / 14px 14px no-repeat;
+}
+
+/* Cards que respondem ao clique ganham relevo de papel */
+.pav-card:hover,
+.rpg-card-cena:hover,
+.mural-post:hover {
+  border-color: rgba(199, 168, 90, .4);
+  box-shadow: 0 2px 0 rgba(232, 207, 141, .08), 0 26px 54px rgba(0, 0, 0, .5);
+}
+
+.pav-card > header,
+.rpg-card-cena > span,
+.mural-post > header {
+  border-bottom: var(--cb-linha-fina);
+  background: linear-gradient(180deg, rgba(199, 168, 90, .07), transparent);
+}
+
+/* ==========================================================================
+   Botoes — selos e fitas
+   ========================================================================== */
+
+button,
+.cb-sidebar-item {
+  font-family: var(--cb-fonte-interface);
+}
+
+button:not(.cb-sidebar-item):not(.cb-sidebar-toggle):not(.cb-sidebar-overlay) {
+  border-radius: var(--cb-raio);
+  border: var(--cb-linha-forte);
+  background: linear-gradient(180deg, var(--cb-verde-alto), var(--cb-verde-painel));
+  color: var(--cb-ouro-claro);
+  box-shadow: var(--cb-veludo), 0 6px 16px rgba(0, 0, 0, .28);
+  letter-spacing: .02em;
+  transition: border-color .16s ease, background .16s ease, transform .16s ease;
+}
+
+button:not(.cb-sidebar-item):not(.cb-sidebar-toggle):not(.cb-sidebar-overlay):hover {
+  border-color: rgba(232, 207, 141, .7);
+  background: linear-gradient(180deg, var(--cb-azul-alto), var(--cb-verde-alto));
+  transform: translateY(-1px);
+}
+
+/* Foco visivel, como tinta fresca na margem */
+:focus-visible {
+  outline: 2px solid rgba(232, 207, 141, .6);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Menu lateral — lombada do livro
+   ========================================================================== */
+
+.cb-sidebar-global {
+  background:
+    linear-gradient(90deg, rgba(199, 168, 90, .1), transparent 9%),
+    radial-gradient(circle at 22% 4%, rgba(26, 53, 84, .5), transparent 17rem),
+    linear-gradient(168deg, var(--cb-verde-painel), var(--cb-azul-tinta) 74%);
+  border-right: var(--cb-linha-forte);
+  box-shadow: 22px 0 58px rgba(0, 0, 0, .52);
+}
+
+.cb-sidebar-global::before {
+  border-radius: var(--cb-raio);
+  border-color: rgba(199, 168, 90, .2);
+}
+
+/* Costura vertical da lombada */
+.cb-sidebar-global::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 7px;
+  width: 1px;
+  background: repeating-linear-gradient(180deg, rgba(199, 168, 90, .22) 0 5px, transparent 5px 11px);
+}
+
+.cb-sidebar-perfil {
+  border-bottom: var(--cb-linha-fina);
+  background: linear-gradient(180deg, rgba(199, 168, 90, .09), transparent);
+}
+
+.cb-sidebar-perfil strong {
+  font-family: var(--cb-fonte-titulo);
+  color: var(--cb-ouro-claro);
+}
+
+.cb-sidebar-avatar {
+  border-radius: 50%;
+  border: 1px solid rgba(232, 207, 141, .5);
+  background: radial-gradient(circle, var(--cb-azul-alto), var(--cb-verde-noite));
+}
+
+.cb-sidebar-nav h3 {
+  font-family: var(--cb-fonte-titulo);
+  text-transform: none;
+  letter-spacing: .06em;
+  font-size: .68rem;
+  color: var(--cb-ouro);
+  border-bottom: 1px solid rgba(199, 168, 90, .16);
+  padding-bottom: 6px;
+}
+
+.cb-sidebar-item {
+  border-radius: 2px;
+  border-left: 2px solid transparent;
+  color: var(--cb-texto-suave);
+  transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+
+.cb-sidebar-item:hover {
+  background: rgba(199, 168, 90, .07);
+  border-color: transparent;
+  border-left-color: rgba(199, 168, 90, .45);
+  color: var(--cb-pergaminho);
+  transform: translateX(3px);
+}
+
+.cb-sidebar-item-ativo {
+  color: var(--cb-pergaminho);
+  background: linear-gradient(90deg, rgba(199, 168, 90, .2), rgba(26, 53, 84, .3));
+  border-color: transparent;
+  border-left-color: var(--cb-ouro);
+  box-shadow: inset 0 0 0 1px rgba(199, 168, 90, .16);
+}
+
+.cb-sidebar-footer {
+  border-top: var(--cb-linha-fina);
+}
+
+.cb-sidebar-footer span {
+  font-family: var(--cb-fonte-titulo);
+  color: var(--cb-ouro);
+}
+
+@media (max-width: 900px) {
+  .cb-sidebar-global {
+    border-radius: 0 var(--cb-raio-painel) var(--cb-raio-painel) 0 !important;
+    background:
+      linear-gradient(90deg, rgba(199, 168, 90, .1), transparent 9%),
+      radial-gradient(circle at 22% 4%, rgba(26, 53, 84, .5), transparent 17rem),
+      linear-gradient(168deg, var(--cb-verde-painel), var(--cb-azul-tinta) 74%) !important;
+  }
+}
+
+/* ==========================================================================
+   Pagina inicial — folha de rosto
+   ========================================================================== */
+
+.pav-shell {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 34px 26px 70px;
+}
+
+.pav-topo {
+  position: relative;
+  padding: 30px 32px;
+  border: var(--cb-linha-fina);
+  border-radius: var(--cb-raio-painel);
+  border-bottom: var(--cb-linha-forte);
+  background:
+    linear-gradient(90deg, rgba(199, 168, 90, .1), transparent 14%),
+    radial-gradient(circle at 84% 12%, rgba(26, 53, 84, .55), transparent 24rem),
+    linear-gradient(180deg, rgba(23, 48, 37, .9), rgba(10, 21, 16, .95));
+  box-shadow: var(--cb-sombra-folha), var(--cb-veludo);
+}
+
+.pav-topo small {
+  font-family: var(--cb-fonte-interface);
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  font-size: .62rem;
+  color: var(--cb-ouro);
+}
+
+.pav-topo h2 {
+  font-size: clamp(1.9rem, 3.4vw, 3rem);
+  margin: 6px 0 0;
+  color: var(--cb-ouro-claro);
+}
+
+.pav-topo h2::after {
+  width: 92px;
+}
+
+.pav-resumo {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.pav-resumo article {
+  padding: 18px 18px 16px;
+  text-align: left;
+  border-left: 2px solid rgba(199, 168, 90, .35);
+}
+
+.pav-resumo article small {
+  display: block;
+  font-family: var(--cb-fonte-interface);
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  font-size: .6rem;
+  color: var(--cb-texto-fraco);
+}
+
+.pav-resumo article strong {
+  display: block;
+  margin: 6px 0 2px;
+  font-family: var(--cb-fonte-titulo);
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--cb-ouro-claro);
+}
+
+.pav-resumo article span {
+  font-size: .72rem;
+  color: var(--cb-texto-suave);
+}
+
+.pav-xp,
+.pav-missao i {
+  border: var(--cb-linha-fina);
+  border-radius: 2px;
+  background: rgba(7, 16, 11, .7);
+}
+
+.pav-xp b,
+.pav-missao i b {
+  background: linear-gradient(90deg, var(--cb-ouro-forte), var(--cb-ouro-claro));
+}
+
+.pav-prioridade {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  margin: 20px 0;
+  padding: 22px 24px;
+  border-left: 3px solid var(--cb-ouro);
+}
+
+.pav-prioridade h3 {
+  font-family: var(--cb-fonte-titulo);
+  color: var(--cb-ouro-claro);
+}
+
+.pav-grade {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.pav-card {
+  padding: 20px 20px 22px;
+}
+
+.pav-card > header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  margin: -20px -20px 16px;
+  padding: 16px 20px 13px;
+}
+
+.pav-card > header small {
+  font-family: var(--cb-fonte-interface);
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  font-size: .6rem;
+  color: var(--cb-ouro);
+}
+
+.pav-card > header h3 {
+  margin: 3px 0 0;
+  font-size: 1.22rem;
+  color: var(--cb-pergaminho);
+}
+
+.pav-linha,
+.pav-evento,
+.pav-missao,
+.pav-recompensa {
+  border-bottom: 1px dashed rgba(199, 168, 90, .16);
+}
+
+.pav-linha:last-child,
+.pav-evento:last-child,
+.pav-missao:last-child,
+.pav-recompensa:last-child {
+  border-bottom: 0;
+}
+
+.pav-linha b {
+  color: var(--cb-ouro);
+  font-family: var(--cb-fonte-interface);
+  font-size: .7rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 1024px) {
+  .pav-resumo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pav-grade { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .pav-shell { padding: 22px 15px 60px; }
+  .pav-topo { padding: 24px 20px; }
+  .pav-prioridade { flex-direction: column; align-items: flex-start; }
+  .pav-resumo { grid-template-columns: 1fr 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button, .cb-sidebar-item { transition: none !important; }
+}
